@@ -1,0 +1,2 @@
+# eosvotes-tally
+EOSVotes Tally
