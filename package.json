@@ -1,0 +1,38 @@
+{
+  "name": "eosvotes-demux-tally",
+  "version": "0.1.0",
+  "description": "EOSVotes Demux Tally",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "src"
+  ],
+  "scripts": {
+    "test": "tslint --project .",
+    "prepare": "tsc",
+    "postpublish": "git push && git push --tags",
+    "docs": "tsc && documentation readme index.js --section=API"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EOS-Nation/eosvotes-demux-tally.git"
+  },
+  "author": "Denis Carriere <denis@eosnation.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/EOS-Nation/eosvotes-demux-tally/issues"
+  },
+  "homepage": "https://github.com/EOS-Nation/eosvotes-demux-tally#readme",
+  "devDependencies": {
+    "@types/request-promise-native": "*",
+    "documentation": "*",
+    "tslint": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "request": "*",
+    "request-promise-native": "*"
+  }
+}

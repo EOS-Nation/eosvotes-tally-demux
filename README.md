@@ -1,2 +1,3 @@
-# eosvotes-tally
-EOSVotes Tally
+# EOSVotes Demux Tally
+
+Documentation to come...
