@@ -10,7 +10,7 @@ const actionHandler = new ObjectActionHandler(
 
 const actionReader = new NodeosActionReader(
     "https://api.eosn.io", // Locally hosted node needed for reasonable indexing speed
-    10141456, // First actions relevant to this dapp happen at this block
+    7813566, // First actions relevant to this dapp happen at this block
 )
 
 const actionWatcher = new BaseActionWatcher(

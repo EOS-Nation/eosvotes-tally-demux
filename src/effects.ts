@@ -1,12 +1,12 @@
-function logUpdate(state: any, payload: any, blockInfo: any, context: any) {
-    console.info("State updated:\n", JSON.stringify(state, null, 2))
+import { State, PayloadPropose } from "./types"
+
+function logPropose(state: State, payload: PayloadPropose, blockInfo: any, context: any) {
+    console.info("Propose updated:\n", JSON.stringify(state, null, 2))
 }
 
-const effects = [
+export default [
     {
-        actionType: "eosio.token::transfer",
-        effect: logUpdate,
+        actionType: "eosforumdapp::propose",
+        effect: logPropose,
     },
 ]
-
-export default effects

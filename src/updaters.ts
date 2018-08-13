@@ -1,24 +1,29 @@
-function parseTokenString(tokenString: string) {
-    const [amountString, symbol] = tokenString.split(" ")
-    const amount = parseFloat(amountString)
-    return { amount, symbol }
-}
+import { State, PayloadPropose } from "./types";
 
-function updateTransferData(state: any, payload: any, blockInfo: any, context: any) {
-    const { amount, symbol } = parseTokenString(payload.data.quantity)
-    if (!state.volumeBySymbol[symbol]) {
-        state.volumeBySymbol[symbol] = amount
-    } else {
-        state.volumeBySymbol[symbol] += amount
+function updatePropose(state: State, payload: PayloadPropose, blockInfo: any, context: any) {
+    const proposal = payload.data
+    const { proposer, proposal_name } = proposal
+
+    // Try to parse JSON
+    try {
+        proposal.proposal_json = JSON.parse(proposal.proposal_json)
+    } catch (e) {
+        console.log(e)
     }
-    state.totalTransfers += 1
+
+    // First time proposer
+    if (!state.proposals[proposer]) {
+        state.proposals[proposer] = {}
+        state.proposals[proposer][proposal_name] = proposal
+    // 2nd time proposer
+    } else {
+        state.proposals[proposer][proposal_name] = proposal
+    }
 }
 
-const updaters = [
+export default [
     {
-        actionType: "eosio.token::transfer",
-        updater: updateTransferData,
+        actionType: "eosforumdapp::propose",
+        updater: updatePropose,
     },
 ]
-
-export default updaters

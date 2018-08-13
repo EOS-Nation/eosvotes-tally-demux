@@ -10,6 +10,7 @@
     "src"
   ],
   "scripts": {
+    "start": "tsc & node index.js",
     "test": "tslint --project .",
     "prepare": "tsc",
     "postpublish": "git push && git push --tags",
