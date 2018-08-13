@@ -31,14 +31,15 @@ export function createProposalKey(data: {proposer: string, proposal_name: string
  * Log Info
  *
  * @param {string} actionType ActionType
+ * @param {number} blockNumber Block Number
  * @param {string} message Message
  * @returns {void}
  * @example
  * logInfo("eosforumdapp::propose", "eoscanadacom:havefunornot")
  */
-export function logInfo(actionType: string, message: string) {
+export function logInfo(actionType: string, blockNumber: number, message: string) {
     const time = new Date().toLocaleString();
-    console.info(chalk.green(`${time}    ${actionType}    ${message}`))
+    console.info(chalk.green(`${time}    ${blockNumber}    ${actionType}    ${message}`))
 }
 
 /**
