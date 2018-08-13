@@ -2,6 +2,7 @@ import { BaseActionWatcher, NodeosActionReader } from "./demux-js"
 import updaters from "./src/updaters"
 import effects from "./src/effects"
 import ObjectActionHandler from "./src/ObjectActionHandler"
+import * as config from "./config"
 
 const actionHandler = new ObjectActionHandler(
     updaters,
@@ -9,8 +10,8 @@ const actionHandler = new ObjectActionHandler(
 )
 
 const actionReader = new NodeosActionReader(
-    "https://api.eosn.io", // Locally hosted node needed for reasonable indexing speed
-    7813566, // First actions relevant to this dapp happen at this block
+    config.EOSIO_API, // Locally hosted node needed for reasonable indexing speed
+    config.EOSVOTES_FIRST_BLOCK, // First actions relevant to this dapp happen at this block
 )
 
 const actionWatcher = new BaseActionWatcher(

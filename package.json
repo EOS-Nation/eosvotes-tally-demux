@@ -10,7 +10,7 @@
     "src"
   ],
   "scripts": {
-    "start": "tsc & node index.js",
+    "start": "tsc && node index.js",
     "test": "tslint --project .",
     "prepare": "tsc",
     "postpublish": "git push && git push --tags",
@@ -27,12 +27,16 @@
   },
   "homepage": "https://github.com/EOS-Nation/eosvotes-demux-tally#readme",
   "devDependencies": {
+    "@types/dotenv": "*",
     "@types/request-promise-native": "*",
     "documentation": "*",
     "tslint": "*",
     "typescript": "*"
   },
   "dependencies": {
+    "axios": "*",
+    "chalk": "*",
+    "dotenv": "*",
     "request": "*",
     "request-promise-native": "*"
   }
