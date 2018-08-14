@@ -1,11 +1,11 @@
 import { getAccountStaked, parseJSON, createProposalKey, logError } from "./utils";
-import { State, PayloadPropose, PayloadUnpropose, BlockInfo, ProposeJSON, PayloadVote, Tally, Voter } from "../types";
+import { State, Payload, Propose, Unpropose, BlockInfo, ProposeJSON, Vote, Tally, Voter } from "../types";
 import { EOSVOTES_CODE } from "../config"
 
 /**
  * Propose - creation of new proposal based on proposer + proposal_name
  */
-function updatePropose(state: State, payload: PayloadPropose, blockInfo: BlockInfo, context: any) {
+function updatePropose(state: State, payload: Payload<Propose>, blockInfo: BlockInfo, context: any) {
     const proposal_key = createProposalKey(payload.data);
     const proposal_json = parseJSON(payload.data.proposal_json);
     const { proposer, proposal_name, title } = payload.data;
@@ -53,7 +53,7 @@ function updatePropose(state: State, payload: PayloadPropose, blockInfo: BlockIn
 /**
  * Unpropose - removal of proposal based on proposer + proposal_name
  */
-function updateUnpropose(state: State, payload: PayloadUnpropose, blockInfo: BlockInfo, context: any) {
+function updateUnpropose(state: State, payload: Payload<Unpropose>, blockInfo: BlockInfo, context: any) {
     const proposal_key = createProposalKey(payload.data);
 
     // Delete proposal
@@ -66,7 +66,7 @@ function updateUnpropose(state: State, payload: PayloadUnpropose, blockInfo: Blo
 /**
  * Vote - voter casts registers his vote on proposal
  */
-async function updateVote(state: State, payload: PayloadVote, blockInfo: BlockInfo, context: any) {
+async function updateVote(state: State, payload: Payload<Vote>, blockInfo: BlockInfo, context: any) {
     const {voter, vote} = payload.data;
     const proposal_key = createProposalKey(payload.data);
     const staked = await getAccountStaked(voter);

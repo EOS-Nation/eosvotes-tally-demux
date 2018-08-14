@@ -40,7 +40,7 @@ export function createProposalKey(data: {proposer: string, proposal_name: string
  */
 export function logInfo(actionType: string, blockNumber: number, message: string) {
     const time = new Date().toLocaleString();
-    console.info(chalk.green(`${time}    ${blockNumber}    ${actionType}    ${message}`))
+    console.info(`${time}    ${blockNumber}    ${actionType}    ${message}`)
 }
 
 /**
