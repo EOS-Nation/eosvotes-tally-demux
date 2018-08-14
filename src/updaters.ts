@@ -1,4 +1,4 @@
-import { getAccountStaked, parseJSON, createProposalKey } from "./utils";
+import { getAccountStaked, parseJSON, createProposalKey, logError } from "./utils";
 import { State, PayloadPropose, PayloadUnpropose, BlockInfo, ProposeJSON, PayloadVote, Tally, Voter } from "../types";
 import { EOSVOTES_CODE } from "../config"
 
@@ -81,7 +81,11 @@ async function updateVote(state: State, payload: PayloadVote, blockInfo: BlockIn
     }
 
     // Add voter to Tally
-    state.tally[proposal_key].voters.set(voter, {staked, vote})
+    if (state.tally[proposal_key]) {
+        state.tally[proposal_key].voters.set(voter, {staked, vote})
+    } else {
+        logError("eosforumdapp::vote", blockInfo.blockNumber, `tally missing proposal_key [${proposal_key}]`)
+    }
 
     // Re-calculate Tally
     // TO-DO
