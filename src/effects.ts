@@ -20,7 +20,19 @@ export default [
         effect: logBase,
     },
     {
+        actionType: `${EOSVOTES_CODE}::unvote`,
+        effect: logBase,
+    },
+    {
+        actionType: `${EOSVOTES_CODE}::cleanvotes`,
+        effect: logBase,
+    },
+    {
         actionType: `eosio::delegatebw`,
+        effect: logBase
+    },
+    {
+        actionType: `eosio::undelegatebw`,
         effect: logBase
     },
 ]
