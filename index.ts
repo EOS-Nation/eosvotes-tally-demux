@@ -1,4 +1,5 @@
-import { BaseActionWatcher, NodeosActionReader } from "./demux-js"
+import { BaseActionWatcher } from "./demux-js"
+import { NodeosActionReader } from "./demux-js-leveldb-plugin"
 import updaters from "./src/updaters"
 import effects from "./src/effects"
 import ObjectActionHandler from "./src/ObjectActionHandler"
