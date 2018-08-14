@@ -1,6 +1,7 @@
 import { AbstractActionReader } from "../demux-js/demux/readers/AbstractActionReader"
 import { NodeosBlock } from "../demux-js/demux/readers/eos/NodeosBlock"
 
+import { LevelUpBase, Batch } from "levelup"
 import request from "request-promise-native"
 
 /**
@@ -16,6 +17,7 @@ export class NodeosActionReader extends AbstractActionReader {
     protected onlyIrreversible: boolean = false,
     protected maxHistoryLength: number = 600,
     protected requestInstance: any = request,
+    protected db: LevelUpBase<Batch>
   ) {
     super(startAtBlock, onlyIrreversible, maxHistoryLength)
     // Remove trailing slashes
@@ -40,13 +42,32 @@ export class NodeosActionReader extends AbstractActionReader {
    * Returns a promise for a `NodeosBlock`.
    */
   public async getBlock(blockNumber: number): Promise<NodeosBlock> {
-    // console.log(`${this.nodeosEndpoint}/v1/chain/get_block`, { block_num_or_id: blockNumber })
-    const rawBlock = await this.httpRequest("post", {
-      url: `${this.nodeosEndpoint}/v1/chain/get_block`,
-      json: { block_num_or_id: blockNumber },
-    })
-    const block = new NodeosBlock(rawBlock)
-    return block
+    // Query LevelDB first
+    try {
+        const cachedBlock = await this.db.get(blockNumber)
+        console.log(`leveldb`, { block_num_or_id: blockNumber })
+        if (cachedBlock) { return JSON.parse(cachedBlock) }
+    } catch (e) {
+        // not caching
+        console.log(`${this.nodeosEndpoint}/v1/chain/get_block`, { block_num_or_id: blockNumber })
+    }
+    while (true) {
+        try {
+            // Query EOSIO API
+            const rawBlock = await this.httpRequest("post", {
+                url: `${this.nodeosEndpoint}/v1/chain/get_block`,
+                json: { block_num_or_id: blockNumber },
+            })
+            const block = new NodeosBlock(rawBlock)
+
+            // Store in LevelDB for caching
+            await this.db.put(blockNumber, JSON.stringify(block))
+            return block
+        } catch (e) {
+            // connection issue
+            console.log('connection issue')
+        }
+    }
   }
 
   protected async httpRequest(method: string, requestParams: any): Promise<any> {
