@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "start": "tsc && node index.js",
-    "test": "tslint --project .",
+    "pretest": "tslint --project .",
+    "test": "tsc && tap src/**.test.js",
     "prepare": "tsc",
     "postpublish": "git push && git push --tags",
     "docs": "tsc && documentation readme index.js --section=API"
@@ -29,7 +30,10 @@
   "devDependencies": {
     "@types/dotenv": "*",
     "@types/request-promise-native": "*",
+    "@types/tape": "*",
     "documentation": "*",
+    "tap": "*",
+    "tape": "*",
     "tslint": "*",
     "typescript": "*"
   },

@@ -12,6 +12,7 @@ const actionHandler = new ObjectActionHandler(
 const actionReader = new NodeosActionReader(
     config.EOSIO_API, // Locally hosted node needed for reasonable indexing speed
     config.EOSVOTES_FIRST_BLOCK, // First actions relevant to this dapp happen at this block
+    config.EOSVOTES_ONLY_IRREVERSIBLE // Only irreversible blocks
 )
 
 const actionWatcher = new BaseActionWatcher(

@@ -1,7 +1,8 @@
 import axios from "axios";
 import chalk from "chalk";
+import * as crypto from "crypto"
 import * as config from "../config";
-import { GetAccount } from "../types";
+import { GetAccount, GetTableRows } from "../types";
 
 /**
  * Parse Token String
@@ -75,7 +76,51 @@ export async function getAccountStaked(account_name: string) {
     } else { return 0; }
 }
 
-// (async () => {
-//     const data = await getAccountStaked("eosnationftw")
-//     console.log(data);
-// })()
+/**
+ * Get Table Rows
+ *
+ * @param {string} code Provide the smart contract name
+ * @param {string} scope Provide the account name
+ * @param {string} table Provide the table name
+ * @param {object} [options={}] Optional parameters
+ * @param {number} [options.lower_bound] Provide the lower bound
+ * @param {number} [options.upper_bound] Provide the upper bound
+ * @param {number} [options.limit] Provide the limit
+ * @returns {object} Table Rows
+ */
+export async function getTableRows<T = any>(code: string, scope: string, table: string, options: {
+    lower_bound?: number,
+    upper_bound?: number,
+    limit?: number,
+} = {}) {
+    const url = config.EOSIO_API + '/v1/chain/get_table_rows';
+    const params: any = {code, scope, table, json: true};
+
+    // optional parameters
+    if (options.lower_bound) { params.lower_bound }
+    if (options.upper_bound) { params.upper_bound }
+    if (options.limit) { params.limit }
+
+    try {
+        const {data} = await axios.post<GetTableRows<T>>(url, params)
+        return data
+    } catch (e) {
+        throw new Error(e);
+    }
+}
+
+/**
+ * Parse Proposal hash
+ * @param {string} title Title
+ * @param {object|string} proposal_json Proposal JSON
+ * @returns {string} Proposal Hash
+ */
+export function parseProposalHash(title: string, proposal_json: string | object) {
+    if (typeof proposal_json === "object") {
+        proposal_json = JSON.stringify(JSON.stringify(proposal_json));
+
+        // Not sure if an issue with eosforumdapp hash, but need to prevent escaping of \n
+        proposal_json = proposal_json.replace("\\n", "\n")
+    }
+    return crypto.createHash('sha256').update(title + proposal_json, 'utf8').digest().toString('hex')
+}

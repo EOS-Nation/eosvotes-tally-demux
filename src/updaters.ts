@@ -1,5 +1,6 @@
 import { getAccountStaked, parseJSON, createProposalKey } from "./utils";
 import { State, PayloadPropose, PayloadUnpropose, BlockInfo, ProposeJSON, PayloadVote, Tally, Voter } from "../types";
+import { EOSVOTES_CODE } from "../config"
 
 /**
  * Propose - creation of new proposal based on proposer + proposal_name
@@ -88,15 +89,15 @@ async function updateVote(state: State, payload: PayloadVote, blockInfo: BlockIn
 
 export default [
     {
-        actionType: "eosforumdapp::propose",
+        actionType: `${EOSVOTES_CODE}::propose`,
         updater: updatePropose,
     },
     {
-        actionType: "eosforumdapp::unpropose",
+        actionType: `${EOSVOTES_CODE}::unpropose`,
         updater: updateUnpropose,
     },
     {
-        actionType: "eosforumdapp::vote",
+        actionType: `${EOSVOTES_CODE}::vote`,
         updater: updateVote,
     },
 ]
