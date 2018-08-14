@@ -45,11 +45,11 @@ export class NodeosActionReader extends AbstractActionReader {
     // Query LevelDB first
     try {
         const cachedBlock = await this.db.get(blockNumber)
-        console.log(`leveldb`, { block_num_or_id: blockNumber })
+        // console.log(`leveldb`, { block_num_or_id: blockNumber })
         if (cachedBlock) { return JSON.parse(cachedBlock) }
     } catch (e) {
         // not caching
-        console.log(`${this.nodeosEndpoint}/v1/chain/get_block`, { block_num_or_id: blockNumber })
+        // console.log(`${this.nodeosEndpoint}/v1/chain/get_block`, { block_num_or_id: blockNumber })
     }
     while (true) {
         try {
@@ -65,7 +65,7 @@ export class NodeosActionReader extends AbstractActionReader {
             return block
         } catch (e) {
             // connection issue
-            console.log('connection issue')
+            // console.log('connection issue')
         }
     }
   }

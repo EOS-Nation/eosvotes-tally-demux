@@ -55,7 +55,7 @@ export function logInfo(actionType: string, blockNumber: number, message: string
  */
 export function logError(actionType: string, blockNumber: number, message: string) {
     const time = new Date().toLocaleString();
-    console.info(chalk.green(`${time}    ${blockNumber}    ${actionType}    ${message}`))
+    console.info(chalk.red(`${time}    ${blockNumber}    ${actionType}    ${message}`))
 }
 
 /**
