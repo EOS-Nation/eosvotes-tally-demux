@@ -29,6 +29,7 @@
   "homepage": "https://github.com/EOS-Nation/eosvotes-demux-tally#readme",
   "devDependencies": {
     "@types/dotenv": "*",
+    "@types/leveldown": "*",
     "@types/levelup": "*",
     "@types/request-promise-native": "*",
     "@types/tape": "*",

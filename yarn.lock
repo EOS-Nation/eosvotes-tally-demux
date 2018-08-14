@@ -18,7 +18,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/leveldown@^1.7.1":
+"@types/leveldown@*":
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/@types/leveldown/-/leveldown-1.7.1.tgz#10e1514691988d2312b0b7f8be9021e90d040c81"
   dependencies:
