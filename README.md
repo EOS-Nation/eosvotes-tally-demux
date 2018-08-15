@@ -19,3 +19,13 @@ $ npm install
 ```bash
 $ npm start
 ```
+
+## To-Do
+
+- [ ] Expose State using GraphQL
+- [ ] Improve DemuxJS Error Handling
+  - [ ] Handle forks
+  - [ ] Handle connection issue
+- [ ] Improve Logging
+  - [ ] Average Speed Block/second
+- [ ] Dockerize
