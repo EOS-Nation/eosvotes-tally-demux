@@ -1,4 +1,5 @@
-import { getAccountStaked, parseJSON, createProposalKey, logError } from "./utils";
+import { logError } from "./logging";
+import { getAccountStaked, parseJSON, createProposalKey } from "./utils";
 import { State, Payload, Propose, Unpropose, BlockInfo, ProposeJSON, Vote, Tally, Voter } from "../types";
 import { EOSVOTES_CODE } from "../config"
 
