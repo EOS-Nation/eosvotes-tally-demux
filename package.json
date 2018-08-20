@@ -10,6 +10,7 @@
     "src"
   ],
   "scripts": {
+    "postinstall": "cp .env.example .env",
     "start": "tsc && node index.js",
     "pretest": "tslint --project .",
     "test": "tsc && tap src/**.test.js",
