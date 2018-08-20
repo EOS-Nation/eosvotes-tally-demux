@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  eosvotes:
+    build: .
+    container_name: eosvotes
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+      - "${EOSVOTES_LEVELDB}:/app/${EOSVOTES_LEVELDB}"

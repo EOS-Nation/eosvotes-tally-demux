@@ -1,4 +1,4 @@
-import * as utils from "./utils";
+import * as utils from "../src/utils";
 import test from "tape";
 
 test("getTableRows", async (t) => {
