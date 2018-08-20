@@ -1,16 +1,5 @@
 import { AbstractActionHandler } from "../demux-js"
-import { State } from "../types"
-
-// Initial state
-const state: State = {
-    tally: {},
-    proposals: {},
-    voters: {},
-    indexState: {
-        blockNumber: 0,
-        blockHash: ""
-    },
-}
+import { state } from "../state";
 
 export default class ObjectActionHandler extends AbstractActionHandler {
     async handleWithState(handle: any) {

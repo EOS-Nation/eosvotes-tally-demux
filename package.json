@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/EOS-Nation/eosvotes-demux-tally#readme",
   "devDependencies": {
+    "@types/cron": "*",
     "@types/dotenv": "*",
     "@types/leveldown": "*",
     "@types/levelup": "*",
@@ -43,6 +44,7 @@
   "dependencies": {
     "axios": "*",
     "chalk": "*",
+    "cron": "*",
     "dotenv": "*",
     "leveldown": "*",
     "levelup": "*",

@@ -1,5 +1,7 @@
 import { BaseActionWatcher } from "./demux-js"
 import { NodeosActionReader } from "./demux-js-leveldb-plugin"
+import { CronJob } from "cron";
+import { state } from "./state"
 import updaters from "./src/updaters"
 import effects from "./src/effects"
 import ObjectActionHandler from "./src/ObjectActionHandler"
@@ -31,3 +33,9 @@ const actionWatcher = new BaseActionWatcher(
 )
 
 actionWatcher.watch() // Start watch loop
+
+new CronJob('*/10 * * * * *', async () => {
+    const now = String(new Date())
+    // Save State to JSON
+    console.log(state)
+}, () => {}, true, 'America/Toronto')
