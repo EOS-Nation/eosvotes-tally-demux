@@ -34,7 +34,7 @@ export function createProposalKey(data: {proposer: string, proposal_name: string
  * @example
  * parseJSON("{foo: 'bar'}") //=> {foo: "bar"}
  */
-export function parseJSON(str: string) {
+export function parseJSON(str: string | undefined): object {
     // Try to parse JSON
     if (str) {
         try {
@@ -42,7 +42,8 @@ export function parseJSON(str: string) {
         } catch (e) {
             return  {}
         }
-    } else { return {} }
+    }
+    return {}
 }
 
 /**

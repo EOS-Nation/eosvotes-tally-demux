@@ -3,7 +3,7 @@ export interface VoteBase {
     proposer: string
     proposal_name: string
     proposal_hash?: string
-    vote: boolean
+    vote: number
 }
 
 export interface Vote extends VoteBase {

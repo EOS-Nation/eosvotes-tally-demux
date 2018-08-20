@@ -23,23 +23,11 @@ function updatePropose(state: State, payload: Payload<Propose>, blockInfo: Block
     // Set default tally
     const tally: Tally = {
         active: true,
-        firstVote: {
-            blockNumber,
-            blockHash,
-        },
-        lastVote: {
-            totalVoters: {
-                true: 0,
-                false: 0,
-            },
-            totalStaked: {
-                true: 0,
-                false: 0
-            },
-            blockNumber,
-            blockHash,
-        },
-        voters: new Map()
+        blockNumber,
+        blockHash,
+        totalVoters: {},
+        totalStaked: {},
+        voters: {}
     }
 
     // Update proposals
@@ -71,25 +59,33 @@ async function updateVote(state: State, payload: Payload<Vote>, blockInfo: Block
     const {voter, vote} = payload.data;
     const proposal_key = createProposalKey(payload.data);
     const staked = await getAccountStaked(voter);
+    const vote_json = parseJSON(payload.data.vote_json)
 
     // Add proposal to voter
     if (state.voters[voter]) {
-        state.voters[voter].proposals.add(proposal_key)
+        // Add proposal key to array of proposal
+        if (state.voters[voter].proposals.indexOf(proposal_key) === -1) {
+            state.voters[voter].proposals.push(proposal_key)
+        }
     } else {
         state.voters[voter] = {
-            proposals: new Set(proposal_key)
+            proposals: [proposal_key]
         }
     }
 
     // Add voter to Tally
-    if (state.tally[proposal_key]) {
-        state.tally[proposal_key].voters.set(voter, {staked, vote})
+    const tally = state.tally[proposal_key]
+    if (tally) {
+        tally.blockNumber = blockInfo.blockNumber
+        tally.blockHash = blockInfo.blockHash
+        tally.voters[voter] = {staked, vote, vote_json}
+
+        // To-Do
+        // update => tally.totalVoters
+        // update => tally.totalStaked
     } else {
         logError("eosforumdapp::vote", blockInfo.blockNumber, `tally missing proposal_key [${proposal_key}]`)
     }
-
-    // Re-calculate Tally
-    // TO-DO
 }
 
 export default [

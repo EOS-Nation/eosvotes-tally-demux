@@ -6,9 +6,13 @@ export interface Voter {
      */
     staked: number
     /**
-     * voter's decision (true/false)
+     * voter value
      */
-    vote: boolean
+    vote: number
+    /**
+     * voter JSON
+     */
+    vote_json: object
 }
 
 export interface Tally {
@@ -17,43 +21,31 @@ export interface Tally {
      */
     active: boolean;
     /**
-     * First Vote
+     * total amount of voters based on value (integer)
      */
-    firstVote: {
-        blockNumber: number
-        blockHash: string
+    totalVoters: {
+        [value: number]: number
     },
     /**
-     * Last Vote
+     * total staked votes based on value (integer)
      */
-    lastVote: {
-        totalVoters: {
-            /**
-             * total amount of voters using true
-             */
-            true: number
-            /**
-             * total amount of voters using false
-             */
-            false: number
-        },
-        totalStaked: {
-            /**
-             * total staked votes using true
-             */
-            true: number
-            /**
-             * total staked votes using false
-             */
-            false: number
-        },
-        blockNumber: number
-        blockHash: string
+    totalStaked: {
+        [value: number]: number
     },
+    /**
+     * Last Block Number
+     */
+    blockNumber: number
+    /**
+     * Last Block Hash
+     */
+    blockHash: string
     /**
      * Array of Voters
      */
-    voters: Map<string, Voter>
+    voters: {
+        [account_name: string]: Voter
+    }
 }
 
 export interface State {
@@ -80,7 +72,7 @@ export interface State {
      */
     indexState: {
         blockNumber: number,
-        blockHash: string
+        blockHash: string,
     }
     /**
      * Status of Voters
@@ -95,7 +87,7 @@ export interface State {
             /**
              * proposal_key = "proposer:proposal_name"
              */
-            proposals: Set<string>
+            proposals: string[],
         }
     }
 }
