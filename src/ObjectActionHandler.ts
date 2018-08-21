@@ -1,5 +1,5 @@
 import { AbstractActionHandler } from "../demux-js"
-import { state } from "../state";
+import { state } from "./state";
 
 export default class ObjectActionHandler extends AbstractActionHandler {
     async handleWithState(handle: any) {

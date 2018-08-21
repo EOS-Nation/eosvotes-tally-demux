@@ -1,5 +1,5 @@
 import { EosAction } from "./interfaces"
-import { Block } from "../../../index"
+import { Block } from "../../.."
 
 export class NodeosBlock implements Block {
   public actions: EosAction[]

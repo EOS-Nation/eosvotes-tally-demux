@@ -1,11 +1,11 @@
 import { BaseActionWatcher } from "./demux-js"
 import { NodeosActionReader } from "./demux-js-leveldb-plugin"
 import { CronJob } from "cron";
-import { state } from "./state"
+import { state } from "./src/state"
 import updaters from "./src/updaters"
 import effects from "./src/effects"
 import ObjectActionHandler from "./src/ObjectActionHandler"
-import * as config from "./config"
+import * as config from "./src/config"
 const levelup = require("levelup");
 const leveldown = require("leveldown");
 

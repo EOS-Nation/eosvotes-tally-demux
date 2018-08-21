@@ -1,7 +1,8 @@
+import * as path from "path"
 import dotenv from "dotenv"
 
 // parse .env file
-dotenv.config()
+dotenv.config({path: path.join(__dirname, "..", ".env")})
 
 // EOSIO configurations
 export const EOSIO_API = process.env.EOSIO_API || "https://localhost:8888"

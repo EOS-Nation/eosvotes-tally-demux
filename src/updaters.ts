@@ -1,7 +1,7 @@
 import { logError } from "./logging";
 import { getAccountStaked, parseJSON, createProposalKey } from "./utils";
 import { State, Payload, Propose, Unpropose, BlockInfo, ProposeJSON, Vote, Tally, Voter } from "../types";
-import { EOSVOTES_CODE } from "../config"
+import { EOSVOTES_CODE } from "./config"
 
 /**
  * Propose - creation of new proposal based on proposer + proposal_name

@@ -1,4 +1,4 @@
-import { Block, Effect, IndexState, Updater } from "../../index"
+import { Block, Effect, IndexState, Updater } from "../.."
 
 /**
  * Takes `block`s output from implementations of `AbstractActionReader` and processes their actions through

@@ -1,4 +1,4 @@
-import { Block } from "../../index"
+import { Block } from "../.."
 
 /**
  * Reads blocks from a blockchain, outputting normalized `Block` objects.

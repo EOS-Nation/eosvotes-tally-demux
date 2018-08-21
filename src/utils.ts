@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as crypto from "crypto"
-import * as config from "../config";
+import * as config from "./config";
 import { GetAccount, GetTableRows } from "../types";
 
 /**
@@ -109,3 +109,23 @@ export function parseProposalHash(title: string, proposal_json: string | object)
     }
     return crypto.createHash('sha256').update(title + proposal_json, 'utf8').digest().toString('hex')
 }
+
+
+// const secondsInAWeek = 86400 * 7
+// const weeksInAYear = 52
+
+// // voteWeightToday computes the stake2vote weight for EOS, in order to compute the
+// // decaying value.
+// func voteWeightToday(nowFunc func() time.Time) float64 {
+//   now := time.Now().UTC()
+//   if nowFunc != nil {
+//     now = nowFunc()
+//   }
+
+//   y2k := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
+//   elapsedSinceY2K := now.Sub(y2k)
+//   weeksSinceY2K := int64(elapsedSinceY2K.Seconds() / secondsInAWeek) // truncate to integer weeks
+//   yearsSinceY2K := float64(weeksSinceY2K) / weeksInAYear
+
+//   return math.Pow(2, yearsSinceY2K)
+// }
