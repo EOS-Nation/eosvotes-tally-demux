@@ -1,19 +1,19 @@
 import { logError } from "./logging";
 import { getAccountStaked, parseJSON, createProposalKey } from "./utils";
-import { State, Payload, Propose, Unpropose, BlockInfo, ProposeJSON, Vote, Tally, Voter } from "../types";
+import { State, Payload, EOSForumPropose, EOSForumUnpropose, BlockInfo, EOSForumProposeJSON, Vote, Tally } from "../types";
 import { EOSVOTES_CODE } from "./config"
 
 /**
  * Propose - creation of new proposal based on proposer + proposal_name
  */
-function updatePropose(state: State, payload: Payload<Propose>, blockInfo: BlockInfo, context: any) {
+function updatePropose(state: State, payload: Payload<EOSForumPropose>, blockInfo: BlockInfo, context: any) {
     const proposal_key = createProposalKey(payload.data);
     const proposal_json = parseJSON(payload.data.proposal_json);
     const { proposer, proposal_name, title } = payload.data;
     const { blockHash, blockNumber } = blockInfo;
 
     // Define Proposal with JSON proposal
-    const proposal: ProposeJSON = {
+    const proposal: EOSForumProposeJSON = {
         proposer,
         proposal_name,
         title,
@@ -42,7 +42,7 @@ function updatePropose(state: State, payload: Payload<Propose>, blockInfo: Block
 /**
  * Unpropose - removal of proposal based on proposer + proposal_name
  */
-function updateUnpropose(state: State, payload: Payload<Unpropose>, blockInfo: BlockInfo, context: any) {
+function updateUnpropose(state: State, payload: Payload<EOSForumUnpropose>, blockInfo: BlockInfo, context: any) {
     const proposal_key = createProposalKey(payload.data);
 
     // Delete proposal

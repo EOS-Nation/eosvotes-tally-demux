@@ -110,22 +110,17 @@ export function parseProposalHash(title: string, proposal_json: string | object)
     return crypto.createHash('sha256').update(title + proposal_json, 'utf8').digest().toString('hex')
 }
 
+/**
+ * voteWeightToday computes the stake2vote weight for EOS, in order to compute the decaying value.
+ */
+export function voteWeightToday(): number {
+    const now = Date.now();
+    const secondsInAWeek = 86400 * 7
+    const weeksInAYear = 52
+    const y2k = new Date(Date.UTC(2000, 0, 1, 0, 0, 0, 0)).getTime()
 
-// const secondsInAWeek = 86400 * 7
-// const weeksInAYear = 52
-
-// // voteWeightToday computes the stake2vote weight for EOS, in order to compute the
-// // decaying value.
-// func voteWeightToday(nowFunc func() time.Time) float64 {
-//   now := time.Now().UTC()
-//   if nowFunc != nil {
-//     now = nowFunc()
-//   }
-
-//   y2k := time.Date(2000, time.January, 1, 0, 0, 0, 0, time.UTC)
-//   elapsedSinceY2K := now.Sub(y2k)
-//   weeksSinceY2K := int64(elapsedSinceY2K.Seconds() / secondsInAWeek) // truncate to integer weeks
-//   yearsSinceY2K := float64(weeksSinceY2K) / weeksInAYear
-
-//   return math.Pow(2, yearsSinceY2K)
-// }
+    const elapsedSinceY2K = (now - y2k) / 1000;
+    const weeksSinceY2K = elapsedSinceY2K / secondsInAWeek // truncate to integer weeks
+    const yearsSinceY2K = weeksSinceY2K / weeksInAYear
+    return Math.pow(yearsSinceY2K, 2)
+}

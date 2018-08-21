@@ -76,7 +76,7 @@ export interface TotalResources {
 export interface VoterInfo {
     owner:               string;
     proxy:               string;
-    producers:           any[];
+    producers:           string[];
     staked:              number;
     last_vote_weight:    string;
     proxied_vote_weight: string;

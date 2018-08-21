@@ -1,4 +1,4 @@
-import { Action } from "../../../index"
+import { Action } from "../../.."
 
 export interface EosAuthorization {
   actor: string
