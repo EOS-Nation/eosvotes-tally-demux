@@ -34,8 +34,8 @@ const actionWatcher = new BaseActionWatcher(
 
 actionWatcher.watch() // Start watch loop
 
+// Save State to JSON
 new CronJob('*/10 * * * * *', async () => {
     const now = String(new Date())
-    // Save State to JSON
-    console.log(state)
+    console.log(JSON.stringify(state, null, 4))
 }, () => {}, true, 'America/Toronto')

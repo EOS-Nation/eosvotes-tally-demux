@@ -28,4 +28,16 @@ $ npm start
   - [ ] Handle connection issue
 - [ ] Improve Logging
   - [ ] Average Speed Block/second
-- [ ] Dockerize
+- [x] Dockerize
+- [ ] Clear definition of State JSON schema
+- [ ] Host JSON blobs on api.eosvotes.io
+- [ ] Output scoped JSON file
+- [ ] Host JSON files on AWS
+- [ ] Include vote decay `last_vote_weight`
+- [ ] Reverse vote weight into EOS
+
+## UI Filters
+
+- Proposer name
+- Newest
+- Sort By Votes
