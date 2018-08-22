@@ -1,3 +1,5 @@
+import * as path from "path";
+import * as write from "write-json-file";
 import { BaseActionWatcher } from "./demux-js"
 import { NodeosActionReader } from "./demux-js-leveldb-plugin"
 import { CronJob } from "cron";
@@ -36,6 +38,17 @@ actionWatcher.watch() // Start watch loop
 
 // Save State to JSON
 new CronJob('*/10 * * * * *', async () => {
-    const now = String(new Date())
-    console.log(JSON.stringify(state, null, 4))
+    const name = `${state.indexState.blockNumber}.json`
+
+    // Save Proposals
+    write.sync(path.join(__dirname, "aws", "proposals", "eosvotes-proposals-" + name), state.proposals)
+    write.sync(path.join(__dirname, "aws", "proposals", "latest.json"), state.proposals)
+
+    // Save Tally
+    write.sync(path.join(__dirname, "aws", "tally", "eosvotes-tally-" + name), state.tally)
+    write.sync(path.join(__dirname, "aws", "tally", "latest.json"), state.tally)
+
+    // Save Voters
+    write.sync(path.join(__dirname, "aws", "voters", "eosvotes-voters-" + name), state.voters)
+    write.sync(path.join(__dirname, "aws", "voters", "latest.json"), state.voters)
 }, () => {}, true, 'America/Toronto')

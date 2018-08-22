@@ -1,7 +1,9 @@
 import { logError } from "./logging";
-import { getAccountStaked, parseJSON, createProposalKey } from "./utils";
-import { State, Payload, EOSForumPropose, EOSForumUnpropose, BlockInfo, EOSForumProposeJSON, Vote, Tally } from "../types";
+import { getAccount, parseJSON, createProposalKey } from "./utils";
+import { State, Payload, BlockInfo, Tally, Vote } from "../types";
+import { EOSForumPropose, EOSForumUnpropose, EOSForumProposeJSON, EOSForumVote } from "../types/eosforumdapp";
 import { EOSVOTES_CODE } from "./config"
+import { log } from "util";
 
 /**
  * Propose - creation of new proposal based on proposer + proposal_name
@@ -25,16 +27,19 @@ function updatePropose(state: State, payload: Payload<EOSForumPropose>, blockInf
         active: true,
         blockNumber,
         blockHash,
-        totalVoters: {},
-        totalStaked: {},
-        voters: {}
+        firstBlockNumber: blockNumber,
+        firstBlockHash: blockHash,
+        votes: {},
+        staked: {},
+        last_vote_weight: {},
     }
 
-    // Update proposals
-    if (!state.proposals[proposal_key]) { state.proposals[proposal_key] = proposal }
-    if (!state.tally[proposal_key]) { state.tally[proposal_key] = tally }
+    // Reset or include proposals
+    // If proposer pushes a proposal with the same name, reset tally
+    state.proposals[proposal_key] = proposal
+    state.tally[proposal_key] = tally
 
-    // Update Index State
+    // Update Demux Index State
     state.indexState.blockHash = blockHash
     state.indexState.blockNumber = blockNumber
 }
@@ -49,42 +54,130 @@ function updateUnpropose(state: State, payload: Payload<EOSForumUnpropose>, bloc
     if (state.proposals[proposal_key]) { delete state.proposals[proposal_key] }
 
     // Disable tally
-    if (state.tally[proposal_key]) { state.tally[proposal_key].active = false }
+    if (state.tally[proposal_key]) { delete state.tally[proposal_key] }
 }
 
 /**
  * Vote - voter casts registers his vote on proposal
  */
-async function updateVote(state: State, payload: Payload<Vote>, blockInfo: BlockInfo, context: any) {
-    const {voter, vote} = payload.data;
-    const proposal_key = createProposalKey(payload.data);
-    const staked = await getAccountStaked(voter);
+async function updateVote(state: State, payload: Payload<EOSForumVote>, blockInfo: BlockInfo, context: any) {
+    const eosforumVote = payload.data;
+    const proposal_key = createProposalKey(eosforumVote);
     const vote_json = parseJSON(payload.data.vote_json)
 
-    // Add proposal to voter
-    if (state.voters[voter]) {
-        // Add proposal key to array of proposal
-        if (state.voters[voter].proposals.indexOf(proposal_key) === -1) {
-            state.voters[voter].proposals.push(proposal_key)
+    // HTTP connection required to get account details
+    const account = await getAccount(eosforumVote.voter);
+    if (account === null) { return logError("getAccount", blockInfo.blockNumber, `error retrieving account [${eosforumVote.voter}]`) }
+
+    // EOSVotes Vote
+    const vote: Vote = Object.assign(eosforumVote, {vote_json})
+
+    // Existing proposals
+    const proposals = state.voters[eosforumVote.voter] ? state.voters[eosforumVote.voter].proposals : {}
+
+    // Update Voter Info from EOSIO getAccount
+    // Preserve existing proposals
+    state.voters[eosforumVote.voter] = Object.assign(account.voter_info, {proposals})
+
+    // Update vote details for target proposal
+    state.voters[eosforumVote.voter].proposals[proposal_key] = vote
+
+    // Update Tally Status
+    updateTally(state, blockInfo)
+}
+
+/**
+ * Updates Tally State
+ *
+ * @param {object} state EOSVotes State
+ * @param {object} blockInfo Block Info
+ * @param {string} proposal_key EOSVotes Proposal Key
+ * @returns {void}
+ */
+function updateTally(state: State, blockInfo: BlockInfo) {
+    const { blockNumber, blockHash } = blockInfo;
+
+    // Summary of Votes
+    const summary: {
+        [vote_key: string]: {
+            votes: {
+                [vote: number]: number
+            }
+            staked: {
+                [vote: number]: number
+            }
+            last_vote_weight: {
+                [vote: number]: number
+            }
         }
-    } else {
-        state.voters[voter] = {
-            proposals: [proposal_key]
+    } = {}
+
+    for (const account_name of Object.keys(state.voters)) {
+        // Voter Information
+        const voter = state.voters[account_name];
+
+        // Iterate over each proposal
+        for (const proposal_key of Object.keys(voter.proposals)) {
+            const {vote} = voter.proposals[proposal_key]
+
+            // Update Block Status
+            if (state.tally[proposal_key]) {
+                state.tally[proposal_key].blockNumber = blockNumber
+                state.tally[proposal_key].blockHash = blockHash
+            } else {
+                // Usually happens if EOSVotes tally started after the proposal
+                logError("eosforumdapp::vote", blockNumber, `tally missing proposal_key [${proposal_key}]`)
+
+                // ************
+                // TO-DO
+                // ************
+                // UPDATE missing `proposals`
+
+                // Set default tally
+                const tally: Tally = {
+                    active: true,
+                    blockNumber,
+                    blockHash,
+                    firstBlockNumber: blockNumber,
+                    firstBlockHash: blockHash,
+                    votes: {},
+                    staked: {},
+                    last_vote_weight: {},
+                }
+                state.tally[proposal_key] = tally
+            }
+
+            // Calculate Summary of Votes
+            const vote_key = `${proposal_key}:${vote}`
+
+            // Default Summary if not exist
+            if (!summary[vote_key]) {
+                summary[vote_key] = {
+                    votes: {},
+                    staked: {},
+                    last_vote_weight: {},
+                }
+            }
+
+            if (summary[vote_key].votes[vote]) summary[vote_key].votes[vote] += 1;
+            else summary[vote_key].votes[vote] = 1;
+
+            if (summary[vote_key].staked[vote]) summary[vote_key].staked[vote] += voter.staked;
+            else summary[vote_key].staked[vote] = voter.staked;
+
+            if (summary[vote_key].last_vote_weight[vote]) summary[vote_key].last_vote_weight[vote] += Number(voter.last_vote_weight);
+            else summary[vote_key].last_vote_weight[vote] = Number(voter.last_vote_weight);
         }
     }
 
-    // Add voter to Tally
-    const tally = state.tally[proposal_key]
-    if (tally) {
-        tally.blockNumber = blockInfo.blockNumber
-        tally.blockHash = blockInfo.blockHash
-        tally.voters[voter] = {staked, vote, vote_json}
+    // Save Tally Calculations
+    for (const vote_key of Object.keys(summary)) {
+        const [scope, proposal, vote] = vote_key.split(':')
+        const proposal_key = `${scope}:${proposal}`
 
-        // To-Do
-        // update => tally.totalVoters
-        // update => tally.totalStaked
-    } else {
-        logError("eosforumdapp::vote", blockInfo.blockNumber, `tally missing proposal_key [${proposal_key}]`)
+        state.tally[proposal_key].votes[Number(vote)] = summary[vote_key].votes[Number(vote)];
+        state.tally[proposal_key].staked[Number(vote)] = summary[vote_key].staked[Number(vote)];
+        state.tally[proposal_key].last_vote_weight[Number(vote)] = summary[vote_key].last_vote_weight[Number(vote)];
     }
 }
 

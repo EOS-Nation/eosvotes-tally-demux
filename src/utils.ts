@@ -47,18 +47,19 @@ export function parseJSON(str: string | undefined): object {
 }
 
 /**
- * Get Account Staked EOS (voting weight)
+ * Get Account
  *
  * @param {string} account_name Account Name
  * @returns {number} total staked
  */
-export async function getAccountStaked(account_name: string) {
+export async function getAccount(account_name: string): Promise<GetAccount | null> {
     const url = config.EOSIO_API + '/v1/chain/get_account';
-    const {data} = await axios.post<GetAccount>(url, {account_name})
-    if (data.total_resources) {
-        const {net_weight, cpu_weight} = data.total_resources;
-        return parseTokenString(net_weight).amount + parseTokenString(cpu_weight).amount;
-    } else { return 0; }
+    try {
+        const {data} = await axios.post<GetAccount>(url, {account_name})
+        return data
+    } catch (e) {
+        return null
+    }
 }
 
 /**

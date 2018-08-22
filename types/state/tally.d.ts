@@ -4,22 +4,22 @@ export interface Tally {
      */
     active: boolean;
     /**
-     * total amount of voters based on Vote value
+     * total amount of votes
      */
-    voters: {
-        [value: number]: number
+    votes: {
+        [vote: number]: number
     },
     /**
-     * total `staked` votes based on Voter value
+     * total `staked` votes (divide by 10000 for EOS precision)
      */
     staked: {
-        [value: number]: number
+        [vote: number]: number
     },
     /**
-     * total `last_vote_weight` votes based on Vote value
+     * total `last_vote_weight` votes
      */
     last_vote_weight: {
-        [value: number]: number
+        [vote: number]: number
     },
     /**
      * Last Block Number

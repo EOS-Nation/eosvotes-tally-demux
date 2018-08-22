@@ -2,13 +2,13 @@ import * as utils from "../src/utils";
 import test from "tape";
 
 test("getTableRows", async (t) => {
-    const data = await utils.getTableRows("eosforumdapp", "eoscanadacom", "proposal")
+    const data = await utils.getTableRows("eosforumdapp", "eostribeprod", "proposal")
     t.assert(data.rows)
     t.end();
 })
 
-test("getTableRows", async (t) => {
-    const data = await utils.getAccountStaked("eosnationftw")
+test("getAccount", async (t) => {
+    const data = await utils.getAccount("eosnationftw")
     t.assert(data)
     t.end();
 })

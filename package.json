@@ -35,6 +35,7 @@
     "@types/levelup": "*",
     "@types/request-promise-native": "*",
     "@types/tape": "*",
+    "@types/write-json-file": "*",
     "documentation": "*",
     "tap": "*",
     "tape": "*",
@@ -49,6 +50,7 @@
     "leveldown": "*",
     "levelup": "*",
     "request": "*",
-    "request-promise-native": "*"
+    "request-promise-native": "*",
+    "write-json-file": "*"
   }
 }

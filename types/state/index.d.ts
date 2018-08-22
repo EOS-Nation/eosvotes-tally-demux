@@ -8,7 +8,7 @@ export interface State {
     /**
      * Status of vote tally
      */
-    tallies: {
+    tally: {
         /**
          * proposal_key = "proposer:proposal_name"
          */

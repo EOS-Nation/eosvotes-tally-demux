@@ -1,4 +1,4 @@
-export * from "./state";
+export * from "./state/index";
 export * from "./eosforumdapp";
 export * from "./payload";
 export * from "./blockInfo";
