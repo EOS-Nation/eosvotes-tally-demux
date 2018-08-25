@@ -1,4 +1,4 @@
-import { Action } from "../../.."
+import { Action } from "demux"
 
 export interface EosAuthorization {
   actor: string

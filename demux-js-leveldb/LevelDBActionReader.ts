@@ -1,15 +1,14 @@
-import { AbstractActionReader } from "../demux-js/demux/readers/AbstractActionReader"
-import { NodeosBlock } from "../demux-js/demux/readers/eos/NodeosBlock"
-
-import { LevelUpBase, Batch } from "levelup"
 import request from "request-promise-native"
+import { AbstractActionReader } from "../demux-js"
+import { LevelUpBase, Batch } from "levelup"
+import { NodeosBlock } from "../demux-js-eos"
 
 /**
  * Reads from an EOSIO nodeos node to get blocks of actions.
  * It is important to note that deferred transactions will not be included,
  * as these are currently not accessible without the use of plugins.
  */
-export class NodeosActionReader extends AbstractActionReader {
+export class LevelDBActionReader extends AbstractActionReader {
   protected nodeosEndpoint: string
   constructor(
     nodeosEndpoint: string = "http://localhost:8888",
@@ -42,6 +41,7 @@ export class NodeosActionReader extends AbstractActionReader {
    * Returns a promise for a `NodeosBlock`.
    */
   public async getBlock(blockNumber: number): Promise<NodeosBlock> {
+    console.log("leveldb", blockNumber)
     // Query LevelDB first
     try {
         const cachedBlock = await this.db.get(blockNumber)

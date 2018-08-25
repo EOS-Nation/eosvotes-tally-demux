@@ -1,4 +1,4 @@
-import { Block, Effect, IndexState, Updater } from "../.."
+import { Block, Effect, IndexState, Updater } from "./interfaces"
 
 /**
  * Takes `block`s output from implementations of `AbstractActionReader` and processes their actions through
@@ -25,9 +25,11 @@ export abstract class AbstractActionHandler {
     isFirstBlock: boolean,
     isReplay: boolean = false,
   ): Promise<[boolean, number]> {
-    // if (isRollback) {
-    //   await this.rollbackTo(block.blockNumber - 1)
-    // }
+    const { blockInfo } = block
+
+    if (isRollback || (isReplay && isFirstBlock)) {
+      await this.rollbackTo(blockInfo.blockNumber - 1)
+    }
 
     if (!this.lastProcessedBlockHash && this.lastProcessedBlockNumber === 0) {
       const { blockNumber: indexStateBlockNumber, blockHash: indexStateBlockHash } = await this.loadIndexState()
@@ -40,8 +42,8 @@ export abstract class AbstractActionHandler {
     const nextBlockNeeded = this.lastProcessedBlockNumber + 1
 
     // Just processed this block; skip
-    if (block.blockNumber === this.lastProcessedBlockNumber
-        && block.blockHash === this.lastProcessedBlockHash) {
+    if (blockInfo.blockNumber === this.lastProcessedBlockNumber
+        && blockInfo.blockHash === this.lastProcessedBlockHash) {
       return [false, 0]
     }
 
@@ -51,11 +53,11 @@ export abstract class AbstractActionHandler {
     }
     // Only check if this is the block we need if it's not the first block
     if (!isFirstBlock) {
-      if (block.blockNumber !== nextBlockNeeded) {
+      if (blockInfo.blockNumber !== nextBlockNeeded) {
         return [true, nextBlockNeeded]
       }
       // Block sequence consistency should be handled by the ActionReader instance
-      if (block.previousBlockHash !== this.lastProcessedBlockHash) {
+      if (blockInfo.previousBlockHash !== this.lastProcessedBlockHash) {
         throw Error("Block hashes do not match; block not part of current chain.")
       }
     }
@@ -74,8 +76,9 @@ export abstract class AbstractActionHandler {
   protected abstract async updateIndexState(state: any, block: Block, isReplay: boolean, context?: any): Promise<void>
 
   /**
-   * Returns a promise for the `lastProcessedBlockNumber` and `lastProcessedBlockHash` meta state, coinciding with the block
-   * that has just been processed. These are the same values written by `updateIndexState()`.
+   * Returns a promise for the `lastProcessedBlockNumber` and `lastProcessedBlockHash` meta state,
+   * coinciding with the block that has just been processed.
+   * These are the same values written by `updateIndexState()`.
    * @returns A promise that resolves to an `IndexState`
    */
   protected abstract async loadIndexState(): Promise<IndexState>
@@ -94,7 +97,7 @@ export abstract class AbstractActionHandler {
     block: Block,
     context: any,
   ): Promise<void> {
-    const { actions, ...blockInfo } = block
+    const { actions, blockInfo } = block
     for (const action of actions) {
       for (const updater of this.updaters) {
         if (action.type === updater.actionType) {
@@ -113,7 +116,7 @@ export abstract class AbstractActionHandler {
     block: Block,
     context: any,
   ): void {
-    const { actions, ...blockInfo } = block
+    const { actions, blockInfo } = block
     for (const action of actions) {
       for (const effect of this.effects) {
         if (action.type === effect.actionType) {
@@ -124,12 +127,12 @@ export abstract class AbstractActionHandler {
     }
   }
 
-  // /**
-  //  * Will run when a rollback block number is passed to handleActions. Implement this method to
-  //  * handle reversing actions full blocks at a time, until the last applied block is the block
-  //  * number passed to this method. If replay is true, effects should not be processed
-  //  */
-  // protected abstract async rollbackTo(blockNumber: number): Promise<void>
+  /**
+   * Will run when a rollback block number is passed to handleActions. Implement this method to
+   * handle reversing actions full blocks at a time, until the last applied block is the block
+   * number passed to this method.
+   */
+  protected abstract async rollbackTo(blockNumber: number): Promise<void>
 
   /**
    * Calls `runUpdaters` and `runEffects` on the given actions
@@ -140,6 +143,7 @@ export abstract class AbstractActionHandler {
     context: any,
     isReplay: boolean,
   ): Promise<void> {
+    const { blockInfo } = block
 
     await this.runUpdaters(state, block, context)
     if (!isReplay) {
@@ -147,7 +151,7 @@ export abstract class AbstractActionHandler {
     }
 
     await this.updateIndexState(state, block, isReplay, context)
-    this.lastProcessedBlockNumber = block.blockNumber
-    this.lastProcessedBlockHash = block.blockHash
+    this.lastProcessedBlockNumber = blockInfo.blockNumber
+    this.lastProcessedBlockHash = blockInfo.blockHash
   }
 }

@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as write from "write-json-file";
 import { BaseActionWatcher } from "./demux-js"
-import { NodeosActionReader } from "./demux-js-leveldb-plugin"
+import { LevelDBActionReader } from "./demux-js-leveldb"
 import { CronJob } from "cron";
 import { state } from "./src/state"
 import updaters from "./src/updaters"
@@ -19,7 +19,7 @@ const actionHandler = new ObjectActionHandler(
     effects,
 )
 
-const actionReader = new NodeosActionReader(
+const actionReader = new LevelDBActionReader(
     config.EOSIO_API, // Locally hosted node needed for reasonable indexing speed
     config.EOSVOTES_FIRST_BLOCK, // First actions relevant to this dapp happen at this block
     config.EOSVOTES_ONLY_IRREVERSIBLE, // Only irreversible blocks
@@ -31,7 +31,7 @@ const actionReader = new NodeosActionReader(
 const actionWatcher = new BaseActionWatcher(
     actionReader,
     actionHandler,
-    250, // Poll at twice the block interval for less latency
+    500, // Poll at twice the block interval for less latency
 )
 
 actionWatcher.watch() // Start watch loop

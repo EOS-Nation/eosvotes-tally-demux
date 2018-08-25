@@ -1,6 +1,5 @@
-import { AbstractActionReader } from "../AbstractActionReader"
+import { AbstractActionReader } from "../demux-js"
 import { NodeosBlock } from "./NodeosBlock"
-
 import request from "request-promise-native"
 
 /**
