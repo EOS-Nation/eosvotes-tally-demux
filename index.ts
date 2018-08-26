@@ -20,12 +20,10 @@ const actionHandler = new ObjectActionHandler(
 )
 
 const actionReader = new LevelDBActionReader(
+    db, // LevelDB Instance
     config.EOSIO_API, // Locally hosted node needed for reasonable indexing speed
     config.EOSVOTES_FIRST_BLOCK, // First actions relevant to this dapp happen at this block
     config.EOSVOTES_ONLY_IRREVERSIBLE, // Only irreversible blocks
-    undefined,
-    undefined,
-    db
 )
 
 const actionWatcher = new BaseActionWatcher(
@@ -37,7 +35,7 @@ const actionWatcher = new BaseActionWatcher(
 actionWatcher.watch() // Start watch loop
 
 // Save State to JSON
-new CronJob('*/10 * * * * *', async () => {
+new CronJob('*/30 * * * * *', async () => {
     const name = `${state.indexState.blockNumber}.json`
 
     // Save Proposals

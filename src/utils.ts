@@ -1,5 +1,4 @@
 import axios from "axios";
-import * as crypto from "crypto"
 import * as config from "./config";
 import { GetAccount, GetTableRows } from "../types";
 
@@ -93,22 +92,6 @@ export async function getTableRows<T = any>(code: string, scope: string, table: 
     } catch (e) {
         throw new Error(e);
     }
-}
-
-/**
- * Parse Proposal hash
- * @param {string} title Title
- * @param {object|string} proposal_json Proposal JSON
- * @returns {string} Proposal Hash
- */
-export function parseProposalHash(title: string, proposal_json: string | object) {
-    if (typeof proposal_json === "object") {
-        proposal_json = JSON.stringify(JSON.stringify(proposal_json));
-
-        // Not sure if an issue with eosforumdapp hash, but need to prevent escaping of \n
-        proposal_json = proposal_json.replace("\\n", "\n")
-    }
-    return crypto.createHash('sha256').update(title + proposal_json, 'utf8').digest().toString('hex')
 }
 
 /**
