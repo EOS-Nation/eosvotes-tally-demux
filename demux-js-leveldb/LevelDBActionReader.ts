@@ -1,6 +1,8 @@
-import { LevelUpBase, Batch } from "levelup"
-import { NodeosBlock, NodeosActionReader } from "../demux-js-eos"
-import request from "request-promise-native"
+import request from "request-promise-native";
+import axios from "axios";
+import { LevelUpBase, Batch } from "levelup";
+import { NodeosBlock, NodeosActionReader } from "../demux-js-eos";
+import { RawBlock, Action, TransactionElement } from "../demux-js-eos/rawBlock";
 
 /**
  * Reads from an EOSIO nodeos node to get blocks of actions.
@@ -10,12 +12,13 @@ import request from "request-promise-native"
 export class LevelDBActionReader extends NodeosActionReader {
   protected nodeosEndpoint: string
   constructor(
-    protected db: LevelUpBase<Batch>,
     nodeosEndpoint: string = "http://localhost:8888",
     public startAtBlock: number = 1,
     protected onlyIrreversible: boolean = false,
     protected maxHistoryLength: number = 600,
-    protected requestInstance: any = request,
+    protected axiosInstance = axios,
+    protected db: LevelUpBase<Batch>,
+    protected contractBlacklist: string[],
   ) {
     super(nodeosEndpoint, startAtBlock, onlyIrreversible, maxHistoryLength)
     // Remove trailing slashes
@@ -31,10 +34,17 @@ export class LevelDBActionReader extends NodeosActionReader {
     if (block) { return block; }
 
     // API HTTP request for block
-    const rawBlock = await this.httpRequest("post", {
-      url: `${this.nodeosEndpoint}/v1/chain/get_block`,
-      json: { block_num_or_id: blockNumber },
-    });
+    const url = `${this.nodeosEndpoint}/v1/chain/get_block`;
+    const data = { block_num_or_id: blockNumber };
+    const options = { responseType: "json" }
+    const response = await this.axiosInstance.post<RawBlock>(url, data, options);
+    const rawBlock = response.data;
+
+    // Filter actions based on blacklist contracts
+    const blocktwitter = JSON.stringify(rawBlock.transactions).includes("blocktwitter")
+    if (blocktwitter) console.log("before", rawBlock.transactions[0].trx.transaction.actions.length)
+    filterContractBlacklist(rawBlock, this.contractBlacklist)
+    if (blocktwitter) console.log("after", rawBlock.transactions[0].trx.transaction.actions.length)
 
     // Save rawBlock to LevelDB as string
     await this.db.put(blockNumber, JSON.stringify(rawBlock));
@@ -69,4 +79,28 @@ export class LevelDBActionReader extends NodeosActionReader {
     }
     return null
   }
+}
+
+/**
+ * Filter Contract Blacklist
+ */
+function filterContractBlacklist(rawBlock: RawBlock, contractBlacklist: string[]) {
+  // Zero transactions
+  if (!rawBlock.transactions.length) { return rawBlock }
+
+  // const transactions: TransactionElement[] = [];
+
+  // rawBlock.transactions.forEach(transaction => {
+  //   const actions: Action[] = [];
+
+  //   transaction.trx.transaction.actions.forEach(action => {
+  //     if (contractBlacklist.indexOf(action.account) !==1) {
+  //       actions.push(action);
+  //     }
+  //   })
+  //   if (actions.length) {
+  //     transaction.trx.transaction.actions = actions
+  //   }
+  // });
+  return rawBlock
 }

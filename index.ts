@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as write from "write-json-file";
+import axios from "axios"
 import { BaseActionWatcher } from "./demux-js"
 import { LevelDBActionReader } from "./demux-js-leveldb"
 import { CronJob } from "cron";
@@ -12,7 +13,7 @@ const levelup = require("levelup");
 const leveldown = require("leveldown");
 
 // LevelDB to improve local caching
-const db = levelup(leveldown(config.EOSVOTES_LEVELDB));
+const db = levelup(leveldown(config.DEMUX_LEVELDB));
 
 const actionHandler = new ObjectActionHandler(
     updaters,
@@ -20,10 +21,13 @@ const actionHandler = new ObjectActionHandler(
 )
 
 const actionReader = new LevelDBActionReader(
-    db, // LevelDB Instance
     config.EOSIO_API, // Locally hosted node needed for reasonable indexing speed
     config.EOSVOTES_FIRST_BLOCK, // First actions relevant to this dapp happen at this block
     config.EOSVOTES_ONLY_IRREVERSIBLE, // Only irreversible blocks
+    600, // Max History Length
+    axios, // Axios Instance
+    db, // LevelDB Instance
+    config.DEMUX_CONTRACT_BLACKLIST, // Demux Contract Blacklist
 )
 
 const actionWatcher = new BaseActionWatcher(
