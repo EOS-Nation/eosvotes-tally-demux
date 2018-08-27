@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as write from "write-json-file";
 import axios from "axios"
+import express from "express";
 import { BaseActionWatcher } from "./demux-js"
 import { LevelDBActionReader } from "./demux-js-leveldb"
 import { CronJob } from "cron";
@@ -36,7 +37,7 @@ const actionWatcher = new BaseActionWatcher(
 actionWatcher.watch() // Start watch loop
 
 // Save State to JSON
-new CronJob('*/30 * * * * *', async () => {
+new CronJob('* * * * *', async () => {
     const name = `${state.indexState.blockNumber}.json`
 
     // Save Proposals
@@ -51,3 +52,16 @@ new CronJob('*/30 * * * * *', async () => {
     write.sync(path.join(__dirname, "aws", "voters", "eosvotes-voters-" + name), state.voters)
     write.sync(path.join(__dirname, "aws", "voters", "latest.json"), state.voters)
 }, () => {}, true, 'America/Toronto')
+
+// Expose State via simple HTTP express app
+const app = express()
+
+// Full State
+app.get('/', (req, res) => res.json(state))
+app.get('/proposals.json', (req, res) => res.json(state.proposals))
+app.get('/tally.json', (req, res) => res.json(state.tally))
+app.get('/voters.json', (req, res) => res.json(state.voters))
+
+// Scoped State
+// TO-DO
+app.listen(3000, () => console.log('Example app listening on port 3000!'))

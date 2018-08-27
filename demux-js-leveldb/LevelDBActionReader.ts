@@ -29,7 +29,7 @@ export class LevelDBActionReader extends NodeosActionReader {
    * Returns a promise for a `NodeosBlock`.
    */
   public async getBlock(blockNumber: number): Promise<NodeosBlock> {
-    console.log('getBlock', blockNumber);
+    // console.log('getBlock', blockNumber);
 
     // Query LevelDB first
     const block = await this.getLevelBlock(blockNumber)
@@ -110,7 +110,6 @@ function filterContractWhitelist(rawBlock: RawBlock, contractWhitelist: string[]
     transaction.trx.transaction.actions = transaction.trx.transaction.actions.filter(action => {
       // Filter out action if exists in Contract Whitelist
       if (contractWhitelist.indexOf(action.account) !== -1) {
-        console.log(action.account)
         return true
       }
       return false

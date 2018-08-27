@@ -30,6 +30,7 @@
   "devDependencies": {
     "@types/cron": "*",
     "@types/dotenv": "*",
+    "@types/express": "*",
     "@types/leveldown": "*",
     "@types/levelup": "*",
     "@types/request-promise-native": "*",
@@ -48,6 +49,7 @@
     "demux": "^1.0.5",
     "demux-eos": "^1.0.1",
     "dotenv": "*",
+    "express": "*",
     "leveldown": "*",
     "levelup": "*",
     "request": "*",
