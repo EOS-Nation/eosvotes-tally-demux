@@ -29,6 +29,8 @@ export class LevelDBActionReader extends NodeosActionReader {
    * Returns a promise for a `NodeosBlock`.
    */
   public async getBlock(blockNumber: number): Promise<NodeosBlock> {
+    console.log('getBlock', blockNumber);
+
     // Query LevelDB first
     const block = await this.getLevelBlock(blockNumber)
     if (block) { return block; }
