@@ -9,11 +9,7 @@ import updaters from "./src/updaters"
 import effects from "./src/effects"
 import ObjectActionHandler from "./src/ObjectActionHandler"
 import * as config from "./src/config"
-const levelup = require("levelup");
-const leveldown = require("leveldown");
-
-// LevelDB to improve local caching
-const db = levelup(leveldown(config.DEMUX_LEVELDB));
+import { db } from "./src/db"
 
 const actionHandler = new ObjectActionHandler(
     updaters,

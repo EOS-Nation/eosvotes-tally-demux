@@ -1,5 +1,6 @@
 import { AbstractActionHandler, Block } from "../demux-js"
 import { state } from "./state";
+import { db } from "./db";
 
 export default class ObjectActionHandler extends AbstractActionHandler {
     async handleWithState(handle: any) {
@@ -20,6 +21,11 @@ export default class ObjectActionHandler extends AbstractActionHandler {
      * number passed to this method.
      */
     async rollbackTo(blockNumber: number) {
+        try {
+            await db.del(blockNumber)
+        } catch (e) {
+            // NotFoundError: Key not found in database [9000718]
+        }
         console.log("ERASE BLOCK", blockNumber)
     }
 }
