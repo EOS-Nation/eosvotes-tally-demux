@@ -7,7 +7,7 @@ const envPath = path.join(__dirname, "..", ".env")
 dotenv.config({path: envPath})
 
 // EOSIO configurations
-export const EOSIO_API = process.env.EOSIO_API || "https://localhost:8888"
+export const EOSIO_API = process.env.EOSIO_API || "http://localhost:8888"
 
 // EOS Votes configurations
 export const EOSVOTES_FIRST_BLOCK = Number(process.env.EOSVOTES_FIRST_BLOCK || 9304569)
