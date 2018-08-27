@@ -55,6 +55,7 @@ new CronJob('* * * * *', async () => {
 
 // Expose State via simple HTTP express app
 const app = express()
+app.set('json spaces', 2)
 
 // Full State
 app.get('/', (req, res) => res.json(state))
