@@ -28,6 +28,7 @@ const actionReader = new LevelDBActionReader(
     axios, // Axios Instance
     db, // LevelDB Instance
     config.DEMUX_CONTRACT_BLACKLIST, // Demux Contract Blacklist
+    config.DEMUX_CONTRACT_WHITELIST, // Demux Contract Whitelist
 )
 
 const actionWatcher = new BaseActionWatcher(

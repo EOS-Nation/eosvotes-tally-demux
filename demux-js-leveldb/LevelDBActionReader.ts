@@ -1,8 +1,7 @@
-import request from "request-promise-native";
 import axios from "axios";
 import { LevelUpBase, Batch } from "levelup";
 import { NodeosBlock, NodeosActionReader } from "../demux-js-eos";
-import { RawBlock, Action, TransactionElement } from "../demux-js-eos/rawBlock";
+import { RawBlock } from "../demux-js-eos/rawBlock";
 
 /**
  * Reads from an EOSIO nodeos node to get blocks of actions.
@@ -19,6 +18,7 @@ export class LevelDBActionReader extends NodeosActionReader {
     protected axiosInstance = axios,
     protected db: LevelUpBase<Batch>,
     protected contractBlacklist: string[],
+    protected contractWhitelist: string[],
   ) {
     super(nodeosEndpoint, startAtBlock, onlyIrreversible, maxHistoryLength)
     // Remove trailing slashes
@@ -38,13 +38,11 @@ export class LevelDBActionReader extends NodeosActionReader {
     const data = { block_num_or_id: blockNumber };
     const options = { responseType: "json" }
     const response = await this.axiosInstance.post<RawBlock>(url, data, options);
-    const rawBlock = response.data;
+    let rawBlock = response.data;
 
-    // Filter actions based on blacklist contracts
-    const blocktwitter = JSON.stringify(rawBlock.transactions).includes("blocktwitter")
-    if (blocktwitter) console.log("before", rawBlock.transactions[0].trx.transaction.actions.length)
-    filterContractBlacklist(rawBlock, this.contractBlacklist)
-    if (blocktwitter) console.log("after", rawBlock.transactions[0].trx.transaction.actions.length)
+    // Apply Action Filters
+    if (this.contractBlacklist.length) filterContractBlacklist(rawBlock, this.contractBlacklist)
+    if (this.contractWhitelist.length) filterContractWhitelist(rawBlock, this.contractWhitelist)
 
     // Save rawBlock to LevelDB as string
     await this.db.put(blockNumber, JSON.stringify(rawBlock));
@@ -85,22 +83,37 @@ export class LevelDBActionReader extends NodeosActionReader {
  * Filter Contract Blacklist
  */
 function filterContractBlacklist(rawBlock: RawBlock, contractBlacklist: string[]) {
-  // Zero transactions
-  if (!rawBlock.transactions.length) { return rawBlock }
+  rawBlock.transactions = rawBlock.transactions.filter(transaction => {
+    if (!transaction.trx.transaction) return false;
 
-  // const transactions: TransactionElement[] = [];
+    transaction.trx.transaction.actions = transaction.trx.transaction.actions.filter(action => {
+      // Filter out action if exists in Contract Blacklist
+      if (contractBlacklist.indexOf(action.account) !== -1) {
+        return false
+      }
+      return true
+    })
+    // Filter transactions with ZERO actions
+    return transaction.trx.transaction.actions.length > 0
+  });
+}
 
-  // rawBlock.transactions.forEach(transaction => {
-  //   const actions: Action[] = [];
+/**
+ * Filter Contract Whitelist
+ */
+function filterContractWhitelist(rawBlock: RawBlock, contractWhitelist: string[]) {
+  rawBlock.transactions = rawBlock.transactions.filter(transaction => {
+    if (!transaction.trx.transaction) return false;
 
-  //   transaction.trx.transaction.actions.forEach(action => {
-  //     if (contractBlacklist.indexOf(action.account) !==1) {
-  //       actions.push(action);
-  //     }
-  //   })
-  //   if (actions.length) {
-  //     transaction.trx.transaction.actions = actions
-  //   }
-  // });
-  return rawBlock
+    transaction.trx.transaction.actions = transaction.trx.transaction.actions.filter(action => {
+      // Filter out action if exists in Contract Whitelist
+      if (contractWhitelist.indexOf(action.account) !== -1) {
+        console.log(action.account)
+        return true
+      }
+      return false
+    })
+    // Filter transactions with ZERO actions
+    return transaction.trx.transaction.actions.length > 0
+  });
 }
