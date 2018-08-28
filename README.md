@@ -20,24 +20,40 @@ $ npm install
 $ npm start
 ```
 
-## To-Do
+## API
 
-- [ ] Expose State using GraphQL
-- [ ] Improve DemuxJS Error Handling
-  - [ ] Handle forks
-  - [ ] Handle connection issue
-- [ ] Improve Logging
-  - [ ] Average Speed Block/second
-- [x] Dockerize
-- [ ] Clear definition of State JSON schema
-- [ ] Host JSON blobs on api.eosvotes.io
-- [ ] Output scoped JSON file
-- [ ] Host JSON files on AWS
-- [ ] Include vote decay `last_vote_weight`
-- [ ] Reverse vote weight into EOS
+## State
 
-## UI Filters
+**HTTP**
+- [https://api.eosvotes.io](https://api.eosvotes.io)
+- [https://api.eosvotes.io/{scope}](https://api.eosvotes.io/eostribeprod)
 
-- Proposer name
-- Newest
-- Sort By Votes
+**Schema**
+- [types/state/index.d.ts](types/state/index.d.ts)
+
+## Tallies
+
+**HTTP**
+- [https://api.eosvotes.io/tallies.json](https://api.eosvotes.io/tallies.json)
+- [https://api.eosvotes.io/{scope}/tallies.json](https://api.eosvotes.io/eostribeprod/tallies.json)
+
+**Schema**
+- [types/state/tally.d.ts](types/state/tally.d.ts)
+
+## Voters
+
+**HTTP**
+- [https://api.eosvotes.io/voters.json](https://api.eosvotes.io/voters.json)
+- [https://api.eosvotes.io/{scope}/voters.json](https://api.eosvotes.io/eostribeprod/voters.json)
+
+**Schema**
+- [types/state/voter.d.ts](types/state/voter.d.ts)
+
+## Proposals
+
+**HTTP**
+- [https://api.eosvotes.io/proposals.json](https://api.eosvotes.io/proposals.json)
+- [https://api.eosvotes.io/{scope}/proposals.json](https://api.eosvotes.io/eostribeprod/proposals.json)
+
+**Schema**
+- [types/eosforumdapp.d.ts](types/eosforumdapp.d.ts)
