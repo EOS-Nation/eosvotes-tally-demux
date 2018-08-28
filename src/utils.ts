@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as config from "./config";
-import { Tallies, Voters, Proposals, State, GetAccount, GetTableRows } from "../types";
+import { EOSForumProposeJSON, EOSForumTableProposal, Tallies, Voters, Proposals, State, GetAccount, GetTableRows } from "../types";
 
 /**
  * Parse Token String
@@ -47,16 +47,17 @@ export function parseJSON(str: string | undefined): object {
 
 /**
  * Get Account
- *
- * @param {string} account_name Account Name
- * @returns {number} total staked
  */
-export async function getAccount(account_name: string): Promise<GetAccount | null> {
+export async function getAccount(account_name: string, maxRetries = 5): Promise<GetAccount | null> {
     const url = config.EOSIO_API + '/v1/chain/get_account';
     try {
         const {data} = await axios.post<GetAccount>(url, {account_name})
         return data
     } catch (e) {
+        console.error(e)
+        if (maxRetries > 0) {
+            return await getAccount(account_name, maxRetries - 1)
+        }
         return null
     }
 }
@@ -93,6 +94,39 @@ export async function getTableRows<T = any>(code: string, scope: string, table: 
         throw new Error(e);
     }
 }
+
+/**
+ * Get `eosio.forum` Proposal
+ * @example
+ * const proposal = await getProposal("eosforumdap", "eostribeprod")
+ */
+export async function getProposal(code: string, proposer: string, proposal_name: string): Promise<EOSForumProposeJSON|null> {
+    // TO-DO handle greater then 50 proposals
+    let limit = 50
+    while (true) {
+        const table = await getTableRows<EOSForumTableProposal>(code, proposer, "proposal", {limit})
+        for (const row of table.rows) {
+            // Match exact proposal_name
+            if (row.proposal_name === proposal_name) {
+                const proposal_json = parseJSON(row.proposal_json);
+                const { proposal_name, title } = row;
+
+                // Define Proposal with JSON proposal
+                const proposal = {
+                    proposer,
+                    proposal_name,
+                    title,
+                    proposal_json
+                }
+                return proposal
+            }
+        }
+        // End of Table
+        if (table.more === false) break;
+    }
+    return null
+}
+
 
 /**
  * voteWeightToday computes the stake2vote weight for EOS, in order to compute the decaying value.
@@ -147,3 +181,4 @@ export function filterVotersByScope(state: State, scope: string): Voters {
     }
     return voters;
 }
+

@@ -1,7 +1,8 @@
 import { logError } from "./logging";
-import { getAccount, parseJSON, createProposalKey, getTableRows } from "./utils";
-import { State, Payload, BlockInfo, Tally, Vote, EOSForumTableProposal } from "../types";
+import { getAccount, parseJSON, createProposalKey, getProposal } from "./utils";
+import { State, Payload, BlockInfo, Tally, Vote, TallySummary } from "../types";
 import { EOSForumPropose, EOSForumUnpropose, EOSForumProposeJSON, EOSForumVote } from "../types/eosforumdapp";
+import { defaultTally } from "./state";
 import { EOSVOTES_CODE } from "./config"
 
 /**
@@ -22,16 +23,7 @@ function updatePropose(state: State, payload: Payload<EOSForumPropose>, blockInf
     }
 
     // Set default tally
-    const tally: Tally = {
-        active: true,
-        blockNumber,
-        blockHash,
-        firstBlockNumber: blockNumber,
-        firstBlockHash: blockHash,
-        votes: {},
-        staked: {},
-        last_vote_weight: {},
-    }
+    const tally: Tally = Object.assign(defaultTally(blockNumber, blockHash), proposal);
 
     // Reset or include proposals
     // If proposer pushes a proposal with the same name, reset tally
@@ -98,17 +90,7 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
 
     // Summary of Votes
     const summary: {
-        [vote_key: string]: {
-            votes: {
-                [vote: number]: number
-            }
-            staked: {
-                [vote: number]: number
-            }
-            last_vote_weight: {
-                [vote: number]: number
-            }
-        }
+        [vote_key: string]: TallySummary
     } = {}
 
     for (const account_name of Object.keys(state.voters)) {
@@ -128,37 +110,16 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
                 logError("eosforumdapp::vote", blockNumber, `tally missing proposal_key [${proposal_key}]`)
 
                 // UPDATE missing `proposals`
-                const [proposer] = proposal_key.split(':')
-                const table = await getTableRows<EOSForumTableProposal>(EOSVOTES_CODE, proposer, "proposal", {limit: 50})
-                for (const row of table.rows) {
-                    const row_key = createProposalKey({proposer, proposal_name: row.proposal_name})
-                    if (proposal_key === row_key) {
-                        const proposal_json = parseJSON(row.proposal_json);
-                        const { proposal_name, title } = row;
+                const [proposer, proposal_name] = proposal_key.split(':')
+                const proposal = await getProposal(EOSVOTES_CODE, proposer, proposal_name)
 
-                        // Define Proposal with JSON proposal
-                        const proposal: EOSForumProposeJSON = {
-                            proposer,
-                            proposal_name,
-                            title,
-                            proposal_json
-                        }
-                        state.proposals[proposal_key] = proposal
-                    }
-                }
+                if (proposal) {
+                    // Set default tally
+                    const tally: Tally = Object.assign(defaultTally(blockNumber, blockHash), proposal);
 
-                // Set default tally
-                const tally: Tally = {
-                    active: true,
-                    blockNumber,
-                    blockHash,
-                    firstBlockNumber: blockNumber,
-                    firstBlockHash: blockHash,
-                    votes: {},
-                    staked: {},
-                    last_vote_weight: {},
+                    state.proposals[proposal_key] = proposal
+                    state.tallies[proposal_key] = tally
                 }
-                state.tallies[proposal_key] = tally
             }
 
             // Calculate Summary of Votes
@@ -166,21 +127,20 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
 
             // Default Summary if not exist
             if (!summary[vote_key]) {
-                summary[vote_key] = {
-                    votes: {},
-                    staked: {},
-                    last_vote_weight: {},
-                }
+                summary[vote_key] = defaultTally(blockNumber, blockHash)
             }
 
             if (summary[vote_key].votes[vote]) summary[vote_key].votes[vote] += 1;
             else summary[vote_key].votes[vote] = 1;
+            summary[vote_key].votes.total += 1;
 
             if (summary[vote_key].staked[vote]) summary[vote_key].staked[vote] += voter.staked;
             else summary[vote_key].staked[vote] = voter.staked;
+            summary[vote_key].staked.total += voter.staked;
 
             if (summary[vote_key].last_vote_weight[vote]) summary[vote_key].last_vote_weight[vote] += Number(voter.last_vote_weight);
             else summary[vote_key].last_vote_weight[vote] = Number(voter.last_vote_weight);
+            summary[vote_key].last_vote_weight.total += Number(voter.last_vote_weight);
         }
     }
 
@@ -189,9 +149,15 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
         const [scope, proposal, vote] = vote_key.split(':')
         const proposal_key = `${scope}:${proposal}`
 
+        // Save Votes
         state.tallies[proposal_key].votes[Number(vote)] = summary[vote_key].votes[Number(vote)];
         state.tallies[proposal_key].staked[Number(vote)] = summary[vote_key].staked[Number(vote)];
         state.tallies[proposal_key].last_vote_weight[Number(vote)] = summary[vote_key].last_vote_weight[Number(vote)];
+
+        // Save Totals
+        state.tallies[proposal_key].votes.total = summary[vote_key].votes.total;
+        state.tallies[proposal_key].staked.total = summary[vote_key].staked.total;
+        state.tallies[proposal_key].last_vote_weight.total = summary[vote_key].last_vote_weight.total;
     }
 }
 

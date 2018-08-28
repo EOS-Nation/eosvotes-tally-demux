@@ -39,8 +39,16 @@ export class LevelDBActionReader extends NodeosActionReader {
     const url = `${this.nodeosEndpoint}/v1/chain/get_block`;
     const data = { block_num_or_id: blockNumber };
     const options = { responseType: "json" }
-    const response = await this.axiosInstance.post<RawBlock>(url, data, options);
-    let rawBlock = response.data;
+
+    let rawBlock: RawBlock;
+    try {
+      const response = await this.axiosInstance.post<RawBlock>(url, data, options);
+      rawBlock = response.data;
+    } catch (e) {
+      // Restart getBlock HTTP request
+      console.error(e);
+      return await this.getBlock(blockNumber);
+    }
 
     // Apply Action Filters
     if (this.contractBlacklist.length) filterContractBlacklist(rawBlock, this.contractBlacklist)
