@@ -3,6 +3,7 @@ version: '3'
 services:
   eosvotes:
     build: .
+    restart: always
     container_name: eosvotes
     env_file:
       - .env
