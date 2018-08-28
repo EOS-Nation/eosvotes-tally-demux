@@ -1,5 +1,3 @@
-import chalk from "chalk";
-
 /**
  * Log Info
  *
@@ -27,5 +25,5 @@ export function logInfo(actionType: string, blockNumber: number, message: string
  */
 export function logError(actionType: string, blockNumber: number, message: string) {
     const time = new Date().toLocaleString();
-    console.info(chalk.red(`${time}    ${blockNumber}    ${actionType}    [ERROR] ${message}`))
+    console.error(`${time}    ${blockNumber}    ${actionType}    [ERROR] ${message}`)
 }

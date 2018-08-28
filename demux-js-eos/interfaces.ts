@@ -1,4 +1,4 @@
-import { Action } from "demux"
+import { Action } from "../demux-js"
 
 export interface EosAuthorization {
   actor: string

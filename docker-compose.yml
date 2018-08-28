@@ -7,5 +7,4 @@ services:
     env_file:
       - .env
     volumes:
-      - ./src:/app/src
-      - "${EOSVOTES_LEVELDB}:/app/${EOSVOTES_LEVELDB}"
+      - "${DEMUX_LEVELDB}:/app/${DEMUX_LEVELDB}"

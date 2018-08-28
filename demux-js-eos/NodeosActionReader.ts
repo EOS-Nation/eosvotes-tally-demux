@@ -1,4 +1,3 @@
-import { default as request, RequestPromise, RequestPromiseOptions } from "request-promise-native";
 import axios from "axios"
 import { AbstractActionReader } from "../demux-js"
 import { NodeosBlock } from "./NodeosBlock"

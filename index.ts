@@ -1,6 +1,3 @@
-// import * as path from "path";
-// import * as write from "write-json-file";
-// import { CronJob } from "cron";
 import axios from "axios"
 import express from "express";
 import { BaseActionWatcher } from "./demux-js"
@@ -37,23 +34,6 @@ const actionWatcher = new BaseActionWatcher(
 
 actionWatcher.watch() // Start watch loop
 
-// // Save State to JSON
-// new CronJob('* * * * *', async () => {
-//     const name = `${state.indexState.blockNumber}.json`
-
-//     // Save Proposals
-//     write.sync(path.join(__dirname, "aws", "proposals", "eosvotes-proposals-" + name), state.proposals)
-//     write.sync(path.join(__dirname, "aws", "proposals", "latest.json"), state.proposals)
-
-//     // Save Tally
-//     write.sync(path.join(__dirname, "aws", "tally", "eosvotes-tally-" + name), state.tally)
-//     write.sync(path.join(__dirname, "aws", "tally", "latest.json"), state.tally)
-
-//     // Save Voters
-//     write.sync(path.join(__dirname, "aws", "voters", "eosvotes-voters-" + name), state.voters)
-//     write.sync(path.join(__dirname, "aws", "voters", "latest.json"), state.voters)
-// }, () => {}, true, 'America/Toronto')
-
 // Expose State via simple HTTP express app
 const app = express()
 app.set('json spaces', 2)
@@ -76,4 +56,4 @@ app.get('/:scope/proposals.json', (req, res) => res.json(filterProposalsByScope(
 app.get('/:scope/tallies.json', (req, res) => res.json(filterTalliesByScope(state, req.params.scope)))
 app.get('/:scope/voters.json', (req, res) => res.json(filterVotersByScope(state, req.params.scope)))
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'))
+app.listen(config.EOSVOTES_PORT, () => console.log(`EOS Votes listening on port ${config.EOSVOTES_PORT}!`))

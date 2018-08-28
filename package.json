@@ -3,19 +3,9 @@
   "version": "0.1.0",
   "description": "EOSVotes Demux Tally",
   "main": "index.js",
-  "types": "index.d.ts",
-  "files": [
-    "index.js",
-    "index.d.ts",
-    "src"
-  ],
   "scripts": {
     "start": "tsc && node index.js",
-    "pretest": "tslint --project .",
-    "test": "tsc && tap src/**.test.js",
-    "prepare": "tsc",
-    "postpublish": "git push && git push --tags",
-    "docs": "tsc && documentation readme index.js --section=API"
+    "test": "tslint --project ."
   },
   "repository": {
     "type": "git",
@@ -28,32 +18,18 @@
   },
   "homepage": "https://github.com/EOS-Nation/eosvotes-demux-tally#readme",
   "devDependencies": {
-    "@types/cron": "*",
     "@types/dotenv": "*",
     "@types/express": "*",
     "@types/leveldown": "*",
     "@types/levelup": "*",
-    "@types/request-promise-native": "*",
-    "@types/tape": "*",
-    "@types/write-json-file": "*",
-    "documentation": "*",
-    "tap": "*",
-    "tape": "*",
     "tslint": "*",
     "typescript": "*"
   },
   "dependencies": {
     "axios": "*",
-    "chalk": "*",
-    "cron": "*",
-    "demux": "^1.0.5",
-    "demux-eos": "^1.0.1",
     "dotenv": "*",
     "express": "*",
     "leveldown": "*",
-    "levelup": "*",
-    "request": "*",
-    "request-promise-native": "*",
-    "write-json-file": "*"
+    "levelup": "*"
   }
 }

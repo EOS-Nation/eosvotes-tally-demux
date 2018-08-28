@@ -1,4 +1,4 @@
-import { Block, BlockInfo } from "demux"
+import { Block, BlockInfo } from "../demux-js"
 import { EosAction } from "./interfaces"
 
 export class NodeosBlock implements Block {
