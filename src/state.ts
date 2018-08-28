@@ -1,7 +1,7 @@
 import { State } from "../types"
 
 export const state: State = {
-    tally: {},
+    tallies: {},
     proposals: {},
     voters: {},
     indexState: {

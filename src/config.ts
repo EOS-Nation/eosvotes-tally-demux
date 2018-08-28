@@ -16,8 +16,8 @@ export const EOSVOTES_ONLY_IRREVERSIBLE = process.env.EOSVOTES_ONLY_IRREVERSIBLE
 
 // DemuxJS
 export const DEMUX_LEVELDB = process.env.DEMUX_LEVELDB || "./mydb";
-export const DEMUX_CONTRACT_BLACKLIST = process.env.DEMUX_CONTRACT_BLACKLIST ? process.env.DEMUX_CONTRACT_BLACKLIST.split(",") : ["blocktwitter"];
-export const DEMUX_CONTRACT_WHITELIST = process.env.DEMUX_CONTRACT_WHITELIST ? process.env.DEMUX_CONTRACT_WHITELIST.split(",") : [""];
+export const DEMUX_CONTRACT_BLACKLIST = process.env.DEMUX_CONTRACT_BLACKLIST ? process.env.DEMUX_CONTRACT_BLACKLIST.split(",") : ["blocktwitter,eosnationtps,eosauthority,eosadddddddd"];
+export const DEMUX_CONTRACT_WHITELIST = process.env.DEMUX_CONTRACT_WHITELIST ? process.env.DEMUX_CONTRACT_WHITELIST.split(",") : [];
 
 // Save .env if does not exist
 if (!fs.existsSync(envPath)) {

@@ -4,36 +4,42 @@ import { Voter } from "./voter"
 export * from "./tally"
 export * from "./voter"
 
+export interface Proposals {
+    /**
+     * proposal_key = "proposer:proposal_name"
+     */
+    [proposal_key: string]: EOSForumProposeJSON
+}
+
+export interface Tallies {
+    /**
+     * proposal_key = "proposer:proposal_name"
+     */
+    [proposal_key: string]: Tally
+}
+
+export interface Voters {
+    /**
+     * Voter Account Name
+     */
+    [account_name: string]: Voter
+}
+
 export interface State {
     /**
-     * Status of vote tally
+     * Status of vote tallies
      */
-    tally: {
-        /**
-         * proposal_key = "proposer:proposal_name"
-         */
-        [proposal_key: string]: Tally
-    }
+    tallies: Tallies,
     /**
      * Status of all proposals
      */
-    proposals: {
-        /**
-         * proposal_key = "proposer:proposal_name"
-         */
-        [proposal_key: string]: EOSForumProposeJSON
-    },
+    proposals: Proposals,
     /**
      * Status of Voters
      *
      * Used to track which proposals to update when undelegatebw & delegatebw actions occur
      */
-    voters: {
-        /**
-         * Voter Account Name
-         */
-        [account_name: string]: Voter
-    }
+    voters: Voters
     /**
      * Demux Index State
      */

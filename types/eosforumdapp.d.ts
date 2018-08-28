@@ -32,3 +32,9 @@ export interface EOSForumUnpropose {
     proposer: string,
     proposal_name: string,
 }
+
+export interface EOSForumTableProposal {
+    proposal_name: string,
+    title: string,
+    proposal_json: string,
+}
