@@ -1,7 +1,7 @@
 import axios from "axios"
 import { AbstractActionReader } from "../demux-js"
 import { NodeosBlock } from "./NodeosBlock"
-import { RawBlock } from "./rawBlock";
+import { RawBlock } from "./RawBlock";
 import { GetInfo } from "./getInfo";
 
 /**

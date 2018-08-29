@@ -79,11 +79,6 @@ async function updateVote(state: State, payload: Payload<EOSForumVote>, blockInf
 
 /**
  * Updates Tally State
- *
- * @param {object} state EOSVotes State
- * @param {object} blockInfo Block Info
- * @param {string} proposal_key EOSVotes Proposal Key
- * @returns {void}
  */
 async function updateTally(state: State, blockInfo: BlockInfo) {
     const { blockNumber, blockHash } = blockInfo;
@@ -161,6 +156,10 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
     }
 }
 
+function updateDelegatebw(state: State, payload: Payload<any>, blockInfo: BlockInfo, context: any) {
+    console.log(JSON.stringify(payload, null, 4))
+}
+
 export default [
     {
         actionType: `${EOSVOTES_CODE}::propose`,
@@ -173,5 +172,13 @@ export default [
     {
         actionType: `${EOSVOTES_CODE}::vote`,
         updater: updateVote,
+    },
+    {
+        actionType: `eosio::delegatebw`,
+        updater: updateDelegatebw,
+    },
+    {
+        actionType: `eosio::undelegatebw`,
+        updater: updateDelegatebw,
     },
 ]

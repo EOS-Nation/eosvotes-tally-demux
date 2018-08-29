@@ -1,4 +1,4 @@
-import { VoterInfo } from "../get_account"
+import { VoterInfo } from "../eosio/chain/get_account"
 
 export interface Vote {
     /**
