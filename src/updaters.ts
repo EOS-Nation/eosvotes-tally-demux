@@ -1,6 +1,6 @@
 import { logError } from "./logging";
 import { getAccount, parseJSON, createProposalKey, getProposal } from "./utils";
-import { State, Payload, BlockInfo, Tally, Vote, TallySummary } from "../types";
+import { State, Payload, BlockInfo, Tally, Vote, TallySummary, Undelegatebw, Delegatebw } from "../types";
 import { EOSForumPropose, EOSForumUnpropose, EOSForumProposeJSON, EOSForumVote } from "../types/eosforumdapp";
 import { defaultTally } from "./state";
 import { EOSVOTES_CODE } from "./config"
@@ -156,8 +156,29 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
     }
 }
 
-function updateDelegatebw(state: State, payload: Payload<any>, blockInfo: BlockInfo, context: any) {
-    console.log(JSON.stringify(payload, null, 4))
+/**
+ * Update Delegatebw & Undelegatebw
+ */
+async function updateDelegatebw(state: State, payload: Delegatebw, blockInfo: BlockInfo, context: any) {
+    const { from, receiver } = payload.data;
+
+    // Update Voter Delegated Resources
+    if (state.voters[from]) await updateVoter(from, state, blockInfo)
+    if (state.voters[receiver]) await updateVoter(receiver, state, blockInfo)
+}
+
+/**
+ * Update Voter Delegated Resources
+ */
+async function updateVoter(account_name: string, state: State, blockInfo: BlockInfo) {
+    // HTTP connection required to get account details
+    const account = await getAccount(account_name);
+    if (account === null) { return logError("getAccount", blockInfo.blockNumber, `error retrieving account [${account_name}]`) }
+
+    // Update Voter Info from EOSIO getAccount
+    state.voters[account_name] = Object.assign(state.voters[account_name], account.voter_info)
+    // Update Tally Status
+    await updateTally(state, blockInfo)
 }
 
 export default [
