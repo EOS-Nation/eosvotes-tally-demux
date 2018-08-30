@@ -85,8 +85,8 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
 
     // Summary of Votes
     const summary: {
-        [vote_key: string]: TallySummary
-    } = {}
+        [proposal_key: string]: TallySummary
+    } = {};
 
     for (const account_name of Object.keys(state.voters)) {
         // Voter Information
@@ -118,41 +118,34 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
             }
 
             // Calculate Summary of Votes
-            const vote_key = `${proposal_key}:${vote}`
-
             // Default Summary if not exist
-            if (!summary[vote_key]) {
-                summary[vote_key] = defaultTally(blockNumber, blockHash)
+            if (!summary[proposal_key]) {
+                summary[proposal_key] = defaultTally(blockNumber, blockHash)
             }
 
-            if (summary[vote_key].votes[vote]) summary[vote_key].votes[vote] += 1;
-            else summary[vote_key].votes[vote] = 1;
-            summary[vote_key].votes.total += 1;
+            // Calculate Votes
+            if (summary[proposal_key].votes[vote]) summary[proposal_key].votes[vote] += 1;
+            else summary[proposal_key].votes[vote] = 1;
+            summary[proposal_key].votes.total += 1;
 
-            if (summary[vote_key].staked[vote]) summary[vote_key].staked[vote] += voter.staked;
-            else summary[vote_key].staked[vote] = voter.staked;
-            summary[vote_key].staked.total += voter.staked;
+            // Calculate Staked
+            if (summary[proposal_key].staked[vote]) summary[proposal_key].staked[vote] += voter.staked;
+            else summary[proposal_key].staked[vote] = voter.staked;
+            summary[proposal_key].staked.total += voter.staked;
 
-            if (summary[vote_key].last_vote_weight[vote]) summary[vote_key].last_vote_weight[vote] += Number(voter.last_vote_weight);
-            else summary[vote_key].last_vote_weight[vote] = Number(voter.last_vote_weight);
-            summary[vote_key].last_vote_weight.total += Number(voter.last_vote_weight);
+            // Calculate Last Vote Weight
+            if (summary[proposal_key].last_vote_weight[vote]) summary[proposal_key].last_vote_weight[vote] += Number(voter.last_vote_weight);
+            else summary[proposal_key].last_vote_weight[vote] = Number(voter.last_vote_weight);
+            summary[proposal_key].last_vote_weight.total += Number(voter.last_vote_weight);
         }
     }
 
     // Save Tally Calculations
-    for (const vote_key of Object.keys(summary)) {
-        const [scope, proposal, vote] = vote_key.split(':')
-        const proposal_key = `${scope}:${proposal}`
-
+    for (const proposal_key of Object.keys(summary)) {
         // Save Votes
-        state.tallies[proposal_key].votes[Number(vote)] = summary[vote_key].votes[Number(vote)];
-        state.tallies[proposal_key].staked[Number(vote)] = summary[vote_key].staked[Number(vote)];
-        state.tallies[proposal_key].last_vote_weight[Number(vote)] = summary[vote_key].last_vote_weight[Number(vote)];
-
-        // Save Totals
-        state.tallies[proposal_key].votes.total = summary[vote_key].votes.total;
-        state.tallies[proposal_key].staked.total = summary[vote_key].staked.total;
-        state.tallies[proposal_key].last_vote_weight.total = summary[vote_key].last_vote_weight.total;
+        state.tallies[proposal_key].votes = summary[proposal_key].votes;
+        state.tallies[proposal_key].staked = summary[proposal_key].staked;
+        state.tallies[proposal_key].last_vote_weight = summary[proposal_key].last_vote_weight;
     }
 }
 

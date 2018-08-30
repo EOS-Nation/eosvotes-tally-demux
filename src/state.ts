@@ -1,4 +1,4 @@
-import { State, Tally } from "../types"
+import { State, Tally, TallySummary } from "../types"
 
 /**
  * Initial State
@@ -17,7 +17,7 @@ export const state: State = {
  * Default Tally
  */
 export function defaultTally(blockNumber: number, blockHash: string): Tally {
-    return {
+    return Object.assign({
         proposer: "",
         proposal_name: "",
         title: "",
@@ -27,6 +27,14 @@ export function defaultTally(blockNumber: number, blockHash: string): Tally {
         blockHash,
         firstBlockNumber: blockNumber,
         firstBlockHash: blockHash,
+    }, defaultTallySummary());
+}
+
+/**
+ * Default Tally Summary
+ */
+export function defaultTallySummary(): TallySummary {
+    return {
         votes: {
             total: 0
         },
@@ -35,6 +43,6 @@ export function defaultTally(blockNumber: number, blockHash: string): Tally {
         },
         last_vote_weight: {
             total: 0
-        },
+        }
     }
 }
