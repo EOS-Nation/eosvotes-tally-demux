@@ -1,7 +1,7 @@
 import axios from "axios";
 import { LevelUpBase, Batch } from "levelup";
 import { NodeosBlock, NodeosActionReader } from "../demux-js-eos";
-import { RawBlock } from "../demux-js-eos/RawBlock";
+import { RawBlock } from "../demux-js-eos";
 
 /**
  * Reads from an EOSIO nodeos node to get blocks of actions.
