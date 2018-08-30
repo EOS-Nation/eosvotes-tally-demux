@@ -5,11 +5,11 @@ export interface EosAuthorization {
   permission: string
 }
 
-export interface EosPayload {
+export interface EosPayload<T = any> {
   account: string
   actionIndex: number
   authorization: EosAuthorization[]
-  data: any
+  data: T
   name: string
   transactionId: string
 }

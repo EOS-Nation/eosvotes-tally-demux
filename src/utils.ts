@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as config from "./config";
-import { EOSForumProposeJSON, EOSForumTableProposal, Tallies, Voters, Proposals, State, GetAccount, GetTableRows } from "../types";
+import { EOSForumProposeJSON, EOSForumTableProposal, Voters, Proposals, State, GetAccount, GetTableRows } from "../types";
 
 /**
  * Parse Token String
@@ -127,7 +127,6 @@ export async function getProposal(code: string, proposer: string, proposal_name:
     return null
 }
 
-
 /**
  * voteWeightToday computes the stake2vote weight for EOS, in order to compute the decaying value.
  */
@@ -142,43 +141,3 @@ export function voteWeightToday(): number {
     const yearsSinceY2K = weeksSinceY2K / weeksInAYear
     return Math.pow(yearsSinceY2K, 2)
 }
-
-/**
- * Filter Proposals by Scope
- */
-export function filterProposalsByScope(state: State, scope: string): Proposals {
-    const proposals: Proposals = {}
-    for (const proposal_key of Object.keys(state.proposals)) {
-        const [proposer] = proposal_key.split(':')
-        if (proposer === scope) proposals[proposal_key] = state.proposals[proposal_key];
-    }
-    return proposals;
-}
-
-/**
- * Filter Tallies by Scope
- */
-export function filterTalliesByScope(state: State, scope: string): Tallies {
-    const tallies: Tallies = {}
-    for (const proposal_key of Object.keys(state.tallies)) {
-        const [proposer] = proposal_key.split(':')
-        if (proposer === scope) tallies[proposal_key] = state.tallies[proposal_key];
-    }
-    return tallies;
-}
-
-/**
- * Filter Voters by Scope
- */
-export function filterVotersByScope(state: State, scope: string): Voters {
-    const voters: Voters = {}
-    for (const account_name of Object.keys(state.voters)) {
-        const account = state.voters[account_name]
-        for (const proposal_key of Object.keys(account.proposals)) {
-            const [proposer] = proposal_key.split(':')
-            if (proposer === scope) voters[account_name] = account
-        }
-    }
-    return voters;
-}
-

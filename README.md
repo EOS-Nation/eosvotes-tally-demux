@@ -1,10 +1,14 @@
 # EOSVotes Demux Tally
 
-[![Build Status](https://travis-ci.org/EOS-Nation/eosvotes-demux-tally.svg?branch=master)](https://travis-ci.org/EOS-Nation/eosvotes-demux-tally)
-[![npm version](https://badge.fury.io/js/eosvotes-demux-tally.svg)](https://badge.fury.io/js/eosvotes-demux-tally)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/EOS-Nation/eosvotes-demux-tally/master/LICENSE)
 
 EOS Votes tally based on DemuxJS, quickly retrieve all proposals and total votes tally on [`eosforumdapp`](https://github.com/eoscanada/eosio.forum).
+
+## EOS Constitution
+
+### [Article XI - Amending](https://github.com/EOS-Mainnet/governance/blob/master/eosio.system/eosio.system-clause-constitution-rc.md#article-xi---amending)
+
+This Constitution and its subordinate documents shall not be amended except by a vote of the token holders with no less than 15% vote participation among tokens and no fewer than 10% more Yes than No votes, sustained for 30 continuous days within a 120 day period.
 
 ## Install
 
@@ -20,40 +24,14 @@ $ npm install
 $ npm start
 ```
 
-## API
+## Full API
 
-## State
-
-**HTTP**
 - [https://api.eosvotes.io](https://api.eosvotes.io)
-- [https://api.eosvotes.io/{scope}](https://api.eosvotes.io/eostribeprod)
+- [https://api.eosvotes.io/proposals](https://api.eosvotes.io/proposals)
+- [https://api.eosvotes.io/voters](https://api.eosvotes.io/voters)
 
-**Schema**
-- [types/state/index.d.ts](types/state/index.d.ts)
+## Scoped API
 
-## Tallies
-
-**HTTP**
-- [https://api.eosvotes.io/tallies.json](https://api.eosvotes.io/tallies.json)
-- [https://api.eosvotes.io/{scope}/tallies.json](https://api.eosvotes.io/eostribeprod/tallies.json)
-
-**Schema**
-- [types/state/tally.d.ts](types/state/tally.d.ts)
-
-## Voters
-
-**HTTP**
-- [https://api.eosvotes.io/voters.json](https://api.eosvotes.io/voters.json)
-- [https://api.eosvotes.io/{scope}/voters.json](https://api.eosvotes.io/eostribeprod/voters.json)
-
-**Schema**
-- [types/state/voter.d.ts](types/state/voter.d.ts)
-
-## Proposals
-
-**HTTP**
-- [https://api.eosvotes.io/proposals.json](https://api.eosvotes.io/proposals.json)
-- [https://api.eosvotes.io/{scope}/proposals.json](https://api.eosvotes.io/eostribeprod/proposals.json)
-
-**Schema**
-- [types/eosforumdapp.d.ts](types/eosforumdapp.d.ts)
+- [https://api.eosvotes.io/proposal/{proposer}](https://api.eosvotes.io/proposal/eostribeprod)
+- [https://api.eosvotes.io/proposal/{proposer}/{proposal_name}](https://api.eosvotes.io/proposal/eostribeprod/bpminpayment)
+- [https://api.eosvotes.io/voter/{voter}](https://api.eosvotes.io/voter/eostribeprod)

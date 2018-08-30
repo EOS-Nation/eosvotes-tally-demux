@@ -6,16 +6,11 @@ export * from "./voter"
 
 export interface Proposals {
     /**
-     * proposal_key = "proposer:proposal_name"
+     * proposer => proposal_name
      */
-    [proposal_key: string]: EOSForumProposeJSON
-}
-
-export interface Tallies {
-    /**
-     * proposal_key = "proposer:proposal_name"
-     */
-    [proposal_key: string]: Tally
+    [proposer: string]: {
+        [proposal_name: string]: Tally
+    }
 }
 
 export interface Voters {
@@ -26,10 +21,6 @@ export interface Voters {
 }
 
 export interface State {
-    /**
-     * Status of vote tallies
-     */
-    tallies: Tallies,
     /**
      * Status of all proposals
      */

@@ -7,7 +7,6 @@ import updaters from "./src/updaters"
 import effects from "./src/effects"
 import ObjectActionHandler from "./src/ObjectActionHandler"
 import * as config from "./src/config"
-import { filterProposalsByScope, filterVotersByScope, filterTalliesByScope } from "./src/utils"
 import { db } from "./src/db"
 
 const actionHandler = new ObjectActionHandler(
@@ -38,22 +37,18 @@ actionWatcher.watch() // Start watch loop
 const app = express()
 app.set('json spaces', 2)
 
-// Full State
+// Full API
 app.get('/', (req, res) => res.json(state))
-app.get('/proposals.json', (req, res) => res.json(state.proposals))
-app.get('/tallies.json', (req, res) => res.json(state.tallies))
-app.get('/voters.json', (req, res) => res.json(state.voters))
+app.get('/proposals(.json)?$', (req, res) => res.json(state.proposals))
+app.get('/voters(.json)?$', (req, res) => res.json(state.voters))
 
-// Scoped State
-app.get('/:scope', (req, res) => {
-    res.json({
-        proposals: filterProposalsByScope(state, req.params.scope),
-        tallies: filterTalliesByScope(state, req.params.scope),
-        voters: filterVotersByScope(state, req.params.scope)
-    })
+// Scoped API
+app.get('/voter/:voter', (req, res) => res.json(state.voters[req.params.voter] || {}))
+app.get('/proposal/:proposer', (req, res) => res.json(state.proposals[req.params.proposer] || {}))
+app.get('/proposal/:proposer/:proposal_name', (req, res) => {
+    const { proposer, proposal_name } = req.params;
+    if (state.proposals[proposer] && state.proposals[proposer][proposal_name]) res.json(state.proposals[proposer][proposal_name])
+    else res.json({})
 })
-app.get('/:scope/proposals.json', (req, res) => res.json(filterProposalsByScope(state, req.params.scope)))
-app.get('/:scope/tallies.json', (req, res) => res.json(filterTalliesByScope(state, req.params.scope)))
-app.get('/:scope/voters.json', (req, res) => res.json(filterVotersByScope(state, req.params.scope)))
 
 app.listen(config.EOSVOTES_PORT, () => console.log(`EOS Votes listening on port ${config.EOSVOTES_PORT}!`))

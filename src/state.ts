@@ -4,7 +4,6 @@ import { State, Tally, TallySummary } from "../types"
  * Initial State
  */
 export const state: State = {
-    tallies: {},
     proposals: {},
     voters: {},
     indexState: {

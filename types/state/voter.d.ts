@@ -13,9 +13,11 @@ export interface Vote {
 
 export interface Voter extends VoterInfo {
     /**
-     * proposal_key = "proposer:proposal_name"
+     * proposer => proposal_name
      */
     proposals: {
-        [proposal_key: string]: Vote
+        [proposer: string]: {
+            [proposal_name: string]: Vote
+        }
     }
 }
