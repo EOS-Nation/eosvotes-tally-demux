@@ -35,3 +35,13 @@ $ npm start
 - [https://api.eosvotes.io/proposal/{proposer}](https://api.eosvotes.io/proposal/eostribeprod)
 - [https://api.eosvotes.io/proposal/{proposer}/{proposal_name}](https://api.eosvotes.io/proposal/eostribeprod/bpminpayment)
 - [https://api.eosvotes.io/voter/{voter}](https://api.eosvotes.io/voter/eostribeprod)
+
+## LevelDB
+
+Quickly setup your local LevelDB cache by downloading from the `eosvotes.io` S3 bucket.
+
+```
+$ cd eosvotes-demux-tally
+$ wget https://s3.amazonaws.com/eosvotes.io/mydb.tar.gz
+$ tar -zxvf mydb.tar.gz
+```
