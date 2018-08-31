@@ -1,6 +1,6 @@
 import axios from "axios";
+import { EOSForumProposeJSON, EOSForumTableProposal, GetAccount, GetTableRows, Proposals, State, Voters } from "../types";
 import * as config from "./config";
-import { EOSForumProposeJSON, EOSForumTableProposal, Voters, Proposals, State, GetAccount, GetTableRows } from "../types";
 
 /**
  * Parse Token String
@@ -11,9 +11,9 @@ import { EOSForumProposeJSON, EOSForumTableProposal, Voters, Proposals, State, G
  * parseTokenString("10.0 EOS") //=> {amount: 10.0, symbol: "EOS"}
  */
 export function parseTokenString(tokenString: string) {
-    const [amountString, symbol] = tokenString.split(" ")
-    const amount = parseFloat(amountString)
-    return {amount, symbol}
+    const [amountString, symbol] = tokenString.split(" ");
+    const amount = parseFloat(amountString);
+    return {amount, symbol};
 }
 
 /**
@@ -37,28 +37,28 @@ export function parseJSON(str: string | undefined): object {
     // Try to parse JSON
     if (str) {
         try {
-            return JSON.parse(str)
+            return JSON.parse(str);
         } catch (e) {
-            return  {}
+            return  {};
         }
     }
-    return {}
+    return {};
 }
 
 /**
  * Get Account
  */
 export async function getAccount(account_name: string, maxRetries = 5): Promise<GetAccount | null> {
-    const url = config.EOSIO_API + '/v1/chain/get_account';
+    const url = config.EOSIO_API + "/v1/chain/get_account";
     try {
-        const {data} = await axios.post<GetAccount>(url, {account_name})
-        return data
+        const {data} = await axios.post<GetAccount>(url, {account_name});
+        return data;
     } catch (e) {
-        console.error(e)
+        console.error(e);
         if (maxRetries > 0) {
-            return await getAccount(account_name, maxRetries - 1)
+            return await getAccount(account_name, maxRetries - 1);
         }
-        return null
+        return null;
     }
 }
 
@@ -79,17 +79,17 @@ export async function getTableRows<T = any>(code: string, scope: string, table: 
     upper_bound?: number,
     limit?: number,
 } = {}) {
-    const url = config.EOSIO_API + '/v1/chain/get_table_rows';
+    const url = config.EOSIO_API + "/v1/chain/get_table_rows";
     const params: any = {code, scope, table, json: true};
 
     // optional parameters
-    if (options.lower_bound) { params.lower_bound }
-    if (options.upper_bound) { params.upper_bound }
-    if (options.limit) { params.limit }
+    if (options.lower_bound) { params.lower_bound; }
+    if (options.upper_bound) { params.upper_bound; }
+    if (options.limit) { params.limit; }
 
     try {
-        const {data} = await axios.post<GetTableRows<T>>(url, params)
-        return data
+        const {data} = await axios.post<GetTableRows<T>>(url, params);
+        return data;
     } catch (e) {
         throw new Error(e);
     }
@@ -102,9 +102,9 @@ export async function getTableRows<T = any>(code: string, scope: string, table: 
  */
 export async function getProposal(code: string, proposer: string, proposal_name: string): Promise<EOSForumProposeJSON|null> {
     // TO-DO handle greater then 50 proposals
-    let limit = 50
+    const limit = 50;
     while (true) {
-        const table = await getTableRows<EOSForumTableProposal>(code, proposer, "proposal", {limit})
+        const table = await getTableRows<EOSForumTableProposal>(code, proposer, "proposal", {limit});
         for (const row of table.rows) {
             // Match exact proposal_name
             if (row.proposal_name === proposal_name) {
@@ -116,15 +116,15 @@ export async function getProposal(code: string, proposer: string, proposal_name:
                     proposer,
                     proposal_name,
                     title,
-                    proposal_json
-                }
-                return proposal
+                    proposal_json,
+                };
+                return proposal;
             }
         }
         // End of Table
-        if (table.more === false) break;
+        if (table.more === false) { break; }
     }
-    return null
+    return null;
 }
 
 /**
@@ -132,12 +132,12 @@ export async function getProposal(code: string, proposer: string, proposal_name:
  */
 export function voteWeightToday(): number {
     const now = Date.now();
-    const secondsInAWeek = 86400 * 7
-    const weeksInAYear = 52
-    const y2k = new Date(Date.UTC(2000, 0, 1, 0, 0, 0, 0)).getTime()
+    const secondsInAWeek = 86400 * 7;
+    const weeksInAYear = 52;
+    const y2k = new Date(Date.UTC(2000, 0, 1, 0, 0, 0, 0)).getTime();
 
     const elapsedSinceY2K = (now - y2k) / 1000;
-    const weeksSinceY2K = elapsedSinceY2K / secondsInAWeek // truncate to integer weeks
-    const yearsSinceY2K = weeksSinceY2K / weeksInAYear
-    return Math.pow(yearsSinceY2K, 2)
+    const weeksSinceY2K = elapsedSinceY2K / secondsInAWeek; // truncate to integer weeks
+    const yearsSinceY2K = weeksSinceY2K / weeksInAYear;
+    return Math.pow(yearsSinceY2K, 2);
 }

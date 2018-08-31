@@ -1,4 +1,4 @@
-import { Block, Effect, IndexState, Updater } from "./interfaces"
+import { Block, Effect, IndexState, Updater } from "./interfaces";
 
 /**
  * Takes `block`s output from implementations of `AbstractActionReader` and processes their actions through
@@ -7,8 +7,8 @@ import { Block, Effect, IndexState, Updater } from "./interfaces"
  * `loadIndexState`.
  */
 export abstract class AbstractActionHandler {
-  protected lastProcessedBlockNumber: number = 0
-  protected lastProcessedBlockHash: string = ""
+  protected lastProcessedBlockNumber: number = 0;
+  protected lastProcessedBlockHash: string = "";
 
   constructor(
     protected updaters: Updater[],
@@ -25,55 +25,55 @@ export abstract class AbstractActionHandler {
     isFirstBlock: boolean,
     isReplay: boolean = false,
   ): Promise<[boolean, number]> {
-    const { blockInfo } = block
+    const { blockInfo } = block;
 
     if (isRollback || (isReplay && isFirstBlock)) {
-      await this.rollbackTo(blockInfo.blockNumber - 1)
+      await this.rollbackTo(blockInfo.blockNumber - 1);
     }
 
     if (!this.lastProcessedBlockHash && this.lastProcessedBlockNumber === 0) {
-      const { blockNumber: indexStateBlockNumber, blockHash: indexStateBlockHash } = await this.loadIndexState()
+      const { blockNumber: indexStateBlockNumber, blockHash: indexStateBlockHash } = await this.loadIndexState();
       if (indexStateBlockNumber && indexStateBlockHash) {
-        this.lastProcessedBlockNumber = indexStateBlockNumber
-        this.lastProcessedBlockHash = indexStateBlockHash
+        this.lastProcessedBlockNumber = indexStateBlockNumber;
+        this.lastProcessedBlockHash = indexStateBlockHash;
       }
     }
 
-    const nextBlockNeeded = this.lastProcessedBlockNumber + 1
+    const nextBlockNeeded = this.lastProcessedBlockNumber + 1;
 
     // Just processed this block; skip
     if (blockInfo.blockNumber === this.lastProcessedBlockNumber
         && blockInfo.blockHash === this.lastProcessedBlockHash) {
-      return [false, 0]
+      return [false, 0];
     }
 
     // If it's the first block but we've already processed blocks, seek to next block
     if (isFirstBlock && this.lastProcessedBlockHash) {
-      return [true, nextBlockNeeded]
+      return [true, nextBlockNeeded];
     }
     // Only check if this is the block we need if it's not the first block
     if (!isFirstBlock) {
       if (blockInfo.blockNumber !== nextBlockNeeded) {
-        return [true, nextBlockNeeded]
+        return [true, nextBlockNeeded];
       }
       // Block sequence consistency should be handled by the ActionReader instance
       if (blockInfo.previousBlockHash !== this.lastProcessedBlockHash) {
-        throw Error("Block hashes do not match; block not part of current chain.")
+        throw Error("Block hashes do not match; block not part of current chain.");
       }
     }
 
     const handleWithArgs: (state: any, context?: any) => void = async (state: any, context: any = {}) => {
-      await this.handleActions(state, block, context, isReplay)
-    }
-    await this.handleWithState(handleWithArgs)
-    return [false, 0]
+      await this.handleActions(state, block, context, isReplay);
+    };
+    await this.handleWithState(handleWithArgs);
+    return [false, 0];
   }
 
   /**
    * Updates the `lastProcessedBlockNumber` and `lastProcessedBlockHash` meta state, coinciding with the block
    * that has just been processed. These are the same values read by `updateIndexState()`.
    */
-  protected abstract async updateIndexState(state: any, block: Block, isReplay: boolean, context?: any): Promise<void>
+  protected abstract async updateIndexState(state: any, block: Block, isReplay: boolean, context?: any): Promise<void>;
 
   /**
    * Returns a promise for the `lastProcessedBlockNumber` and `lastProcessedBlockHash` meta state,
@@ -81,13 +81,13 @@ export abstract class AbstractActionHandler {
    * These are the same values written by `updateIndexState()`.
    * @returns A promise that resolves to an `IndexState`
    */
-  protected abstract async loadIndexState(): Promise<IndexState>
+  protected abstract async loadIndexState(): Promise<IndexState>;
 
   /**
    * Calls handleActions with the appropriate state passed by calling the `handle` parameter function.
    * Optionally, pass in a `context` object as a second parameter.
    */
-  protected abstract async handleWithState(handle: (state: any, context?: any) => void): Promise<void>
+  protected abstract async handleWithState(handle: (state: any, context?: any) => void): Promise<void>;
 
   /**
    * Process actions against deterministically accumulating updater functions.
@@ -97,12 +97,12 @@ export abstract class AbstractActionHandler {
     block: Block,
     context: any,
   ): Promise<void> {
-    const { actions, blockInfo } = block
+    const { actions, blockInfo } = block;
     for (const action of actions) {
       for (const updater of this.updaters) {
         if (action.type === updater.actionType) {
-          const { payload } = action
-          await updater.updater(state, payload, blockInfo, context)
+          const { payload } = action;
+          await updater.updater(state, payload, blockInfo, context);
         }
       }
     }
@@ -116,12 +116,12 @@ export abstract class AbstractActionHandler {
     block: Block,
     context: any,
   ): void {
-    const { actions, blockInfo } = block
+    const { actions, blockInfo } = block;
     for (const action of actions) {
       for (const effect of this.effects) {
         if (action.type === effect.actionType) {
-          const { payload } = action
-          effect.effect(state, payload, blockInfo, context)
+          const { payload } = action;
+          effect.effect(state, payload, blockInfo, context);
         }
       }
     }
@@ -132,7 +132,7 @@ export abstract class AbstractActionHandler {
    * handle reversing actions full blocks at a time, until the last applied block is the block
    * number passed to this method.
    */
-  protected abstract async rollbackTo(blockNumber: number): Promise<void>
+  protected abstract async rollbackTo(blockNumber: number): Promise<void>;
 
   /**
    * Calls `runUpdaters` and `runEffects` on the given actions
@@ -143,15 +143,15 @@ export abstract class AbstractActionHandler {
     context: any,
     isReplay: boolean,
   ): Promise<void> {
-    const { blockInfo } = block
+    const { blockInfo } = block;
 
-    await this.runUpdaters(state, block, context)
+    await this.runUpdaters(state, block, context);
     if (!isReplay) {
-      this.runEffects(state, block, context)
+      this.runEffects(state, block, context);
     }
 
-    await this.updateIndexState(state, block, isReplay, context)
-    this.lastProcessedBlockNumber = blockInfo.blockNumber
-    this.lastProcessedBlockHash = blockInfo.blockHash
+    await this.updateIndexState(state, block, isReplay, context);
+    this.lastProcessedBlockNumber = blockInfo.blockNumber;
+    this.lastProcessedBlockHash = blockInfo.blockHash;
   }
 }

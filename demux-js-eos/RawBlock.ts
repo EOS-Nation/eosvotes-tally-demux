@@ -5,61 +5,61 @@
 //   "Set quicktype target language"
 
 export interface RawBlock {
-    timestamp:          string;
-    producer:           string;
-    confirmed:          number;
-    previous:           string;
-    transaction_mroot:  string;
-    action_mroot:       string;
-    schedule_version:   number;
-    new_producers:      null;
-    header_extensions:  any[];
+    timestamp: string;
+    producer: string;
+    confirmed: number;
+    previous: string;
+    transaction_mroot: string;
+    action_mroot: string;
+    schedule_version: number;
+    new_producers: null;
+    header_extensions: any[];
     producer_signature: string;
-    transactions:       TransactionElement[];
-    block_extensions:   any[];
-    id:                 string;
-    block_num:          number;
-    ref_block_prefix:   number;
+    transactions: TransactionElement[];
+    block_extensions: any[];
+    id: string;
+    block_num: number;
+    ref_block_prefix: number;
 }
 
 export interface TransactionElement {
-    status:          string;
-    cpu_usage_us:    number;
+    status: string;
+    cpu_usage_us: number;
     net_usage_words: number;
-    trx:             Trx;
+    trx: Trx;
 }
 
 export interface Trx {
-    id:                       string;
-    signatures:               string[];
-    compression:              string;
+    id: string;
+    signatures: string[];
+    compression: string;
     packed_context_free_data: string;
-    context_free_data:        any[];
-    packed_trx:               string;
-    transaction:              TrxTransaction;
+    context_free_data: any[];
+    packed_trx: string;
+    transaction: TrxTransaction;
 }
 
 export interface TrxTransaction {
-    expiration:             string;
-    ref_block_num:          number;
-    ref_block_prefix:       number;
-    max_net_usage_words:    number;
-    max_cpu_usage_ms:       number;
-    delay_sec:              number;
-    context_free_actions:   any[];
-    actions:                Action[];
+    expiration: string;
+    ref_block_num: number;
+    ref_block_prefix: number;
+    max_net_usage_words: number;
+    max_cpu_usage_ms: number;
+    delay_sec: number;
+    context_free_actions: any[];
+    actions: Action[];
     transaction_extensions: any[];
 }
 
 export interface Action {
-    account:       string;
-    name:          string;
+    account: string;
+    name: string;
     authorization: Authorization[];
-    data:          any;
-    hex_data:      string;
+    data: any;
+    hex_data: string;
 }
 
 export interface Authorization {
-    actor:      string;
+    actor: string;
     permission: string;
 }

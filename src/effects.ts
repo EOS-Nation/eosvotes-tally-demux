@@ -1,6 +1,6 @@
-import { State, Payload, BlockInfo } from "../types"
-import { logInfo } from "./logging"
-import { EOSVOTES_CODE } from "./config"
+import { BlockInfo, Payload, State } from "../types";
+import { EOSVOTES_CODE } from "./config";
+import { logInfo } from "./logging";
 
 function logBase(state: State, payload: Payload, blockInfo: BlockInfo, context: any) {
     logInfo(`${payload.account}::${payload.name}`, blockInfo.blockNumber, JSON.stringify(payload.data));
@@ -29,10 +29,10 @@ export default [
     },
     {
         actionType: `eosio::delegatebw`,
-        effect: logBase
+        effect: logBase,
     },
     {
         actionType: `eosio::undelegatebw`,
-        effect: logBase
+        effect: logBase,
     },
-]
+];

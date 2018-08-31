@@ -10,7 +10,7 @@
  */
 export function logInfo(actionType: string, blockNumber: number, message: string) {
     const time = new Date().toLocaleString();
-    console.info(`${time}    ${blockNumber}    ${actionType}    [INFO] ${message}`)
+    console.info(`${time}    ${blockNumber}    ${actionType}    [INFO] ${message}`);
 }
 
 /**
@@ -25,5 +25,5 @@ export function logInfo(actionType: string, blockNumber: number, message: string
  */
 export function logError(actionType: string, blockNumber: number, message: string) {
     const time = new Date().toLocaleString();
-    console.error(`${time}    ${blockNumber}    ${actionType}    [ERROR] ${message}`)
+    console.error(`${time}    ${blockNumber}    ${actionType}    [ERROR] ${message}`);
 }

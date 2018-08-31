@@ -1,8 +1,8 @@
-import axios from "axios"
-import { AbstractActionReader } from "../demux-js"
-import { NodeosBlock } from "./NodeosBlock"
-import { RawBlock } from "./RawBlock";
+import axios from "axios";
+import { AbstractActionReader } from "../demux-js";
 import { GetInfo } from "./getInfo";
+import { NodeosBlock } from "./NodeosBlock";
+import { RawBlock } from "./RawBlock";
 
 /**
  * Reads from an EOSIO nodeos node to get blocks of actions.
@@ -10,7 +10,7 @@ import { GetInfo } from "./getInfo";
  * as these are currently not accessible without the use of plugins.
  */
 export class NodeosActionReader extends AbstractActionReader {
-  protected nodeosEndpoint: string
+  protected nodeosEndpoint: string;
   constructor(
     nodeosEndpoint: string = "http://localhost:8888",
     public startAtBlock: number = 1,
@@ -18,9 +18,9 @@ export class NodeosActionReader extends AbstractActionReader {
     protected maxHistoryLength: number = 600,
     protected axiosInstance = axios,
   ) {
-    super(startAtBlock, onlyIrreversible, maxHistoryLength)
+    super(startAtBlock, onlyIrreversible, maxHistoryLength);
     // Remove trailing slashes
-    this.nodeosEndpoint = nodeosEndpoint.replace(/\/+$/g, "")
+    this.nodeosEndpoint = nodeosEndpoint.replace(/\/+$/g, "");
   }
 
   /**
@@ -33,9 +33,9 @@ export class NodeosActionReader extends AbstractActionReader {
     const getInfo = response.data;
 
     if (this.onlyIrreversible) {
-      return getInfo.last_irreversible_block_num
+      return getInfo.last_irreversible_block_num;
     }
-    return getInfo.head_block_num
+    return getInfo.head_block_num;
   }
 
   /**
@@ -45,8 +45,8 @@ export class NodeosActionReader extends AbstractActionReader {
     const url = `${this.nodeosEndpoint}/v1/chain/get_block`;
     const data = { block_num_or_id: blockNumber };
     const options = { responseType: "json" };
-    const response = await this.axiosInstance.post<RawBlock>(url, data, options)
+    const response = await this.axiosInstance.post<RawBlock>(url, data, options);
     const rawBlock = response.data;
-    return new NodeosBlock(rawBlock)
+    return new NodeosBlock(rawBlock);
   }
 }

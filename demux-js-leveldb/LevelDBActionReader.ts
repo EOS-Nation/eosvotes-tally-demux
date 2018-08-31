@@ -1,6 +1,6 @@
 import axios from "axios";
-import { LevelUpBase, Batch } from "levelup";
-import { NodeosBlock, NodeosActionReader } from "../demux-js-eos";
+import { Batch, LevelUpBase } from "levelup";
+import { NodeosActionReader, NodeosBlock } from "../demux-js-eos";
 import { RawBlock } from "../demux-js-eos";
 
 /**
@@ -9,7 +9,7 @@ import { RawBlock } from "../demux-js-eos";
  * as these are currently not accessible without the use of plugins.
  */
 export class LevelDBActionReader extends NodeosActionReader {
-  protected nodeosEndpoint: string
+  protected nodeosEndpoint: string;
   constructor(
     nodeosEndpoint: string = "http://localhost:8888",
     public startAtBlock: number = 1,
@@ -20,9 +20,9 @@ export class LevelDBActionReader extends NodeosActionReader {
     protected contractBlacklist: string[],
     protected contractWhitelist: string[],
   ) {
-    super(nodeosEndpoint, startAtBlock, onlyIrreversible, maxHistoryLength)
+    super(nodeosEndpoint, startAtBlock, onlyIrreversible, maxHistoryLength);
     // Remove trailing slashes
-    this.nodeosEndpoint = nodeosEndpoint.replace(/\/+$/g, "")
+    this.nodeosEndpoint = nodeosEndpoint.replace(/\/+$/g, "");
   }
 
   /**
@@ -32,13 +32,13 @@ export class LevelDBActionReader extends NodeosActionReader {
     // console.log('getBlock', blockNumber);
 
     // Query LevelDB first
-    const block = await this.getLevelBlock(blockNumber)
+    const block = await this.getLevelBlock(blockNumber);
     if (block) { return block; }
 
     // API HTTP request for block
     const url = `${this.nodeosEndpoint}/v1/chain/get_block`;
     const data = { block_num_or_id: blockNumber };
-    const options = { responseType: "json" }
+    const options = { responseType: "json" };
 
     let rawBlock: RawBlock;
     try {
@@ -51,8 +51,8 @@ export class LevelDBActionReader extends NodeosActionReader {
     }
 
     // Apply Action Filters
-    if (this.contractBlacklist.length) filterContractBlacklist(rawBlock, this.contractBlacklist)
-    if (this.contractWhitelist.length) filterContractWhitelist(rawBlock, this.contractWhitelist)
+    if (this.contractBlacklist.length) { filterContractBlacklist(rawBlock, this.contractBlacklist); }
+    if (this.contractWhitelist.length) { filterContractWhitelist(rawBlock, this.contractWhitelist); }
 
     // Save rawBlock to LevelDB as string
     await this.db.put(blockNumber, JSON.stringify(rawBlock));
@@ -65,27 +65,27 @@ export class LevelDBActionReader extends NodeosActionReader {
    * Query LevelDB to receive Nodeos rawBlock
    */
   public async getLevelBlock(blockNumber: number): Promise<NodeosBlock|null> {
-    let rawBlock
+    let rawBlock;
     try {
       // Retrieve string rawBlock from LevelDB
-      rawBlock = await this.db.get(blockNumber)
+      rawBlock = await this.db.get(blockNumber);
     } catch (e) {
       // NotFoundError: Key not found in database [9000718]
-      return null
+      return null;
     }
 
     if (rawBlock) {
       try {
         // Convert rawBlock string to NodeosBlock
-        rawBlock = JSON.parse(rawBlock)
+        rawBlock = JSON.parse(rawBlock);
         return new NodeosBlock(rawBlock);
       } catch (e) {
         // Corrupt block
-        await this.db.del(blockNumber)
-        return null
+        await this.db.del(blockNumber);
+        return null;
       }
     }
-    return null
+    return null;
   }
 }
 
@@ -93,18 +93,18 @@ export class LevelDBActionReader extends NodeosActionReader {
  * Filter Contract Blacklist
  */
 function filterContractBlacklist(rawBlock: RawBlock, contractBlacklist: string[]) {
-  rawBlock.transactions = rawBlock.transactions.filter(transaction => {
-    if (!transaction.trx.transaction) return false;
+  rawBlock.transactions = rawBlock.transactions.filter((transaction) => {
+    if (!transaction.trx.transaction) { return false; }
 
-    transaction.trx.transaction.actions = transaction.trx.transaction.actions.filter(action => {
+    transaction.trx.transaction.actions = transaction.trx.transaction.actions.filter((action) => {
       // Filter out action if exists in Contract Blacklist
       if (contractBlacklist.indexOf(action.account) !== -1) {
-        return false
+        return false;
       }
-      return true
-    })
+      return true;
+    });
     // Filter transactions with ZERO actions
-    return transaction.trx.transaction.actions.length > 0
+    return transaction.trx.transaction.actions.length > 0;
   });
 }
 
@@ -112,17 +112,17 @@ function filterContractBlacklist(rawBlock: RawBlock, contractBlacklist: string[]
  * Filter Contract Whitelist
  */
 function filterContractWhitelist(rawBlock: RawBlock, contractWhitelist: string[]) {
-  rawBlock.transactions = rawBlock.transactions.filter(transaction => {
-    if (!transaction.trx.transaction) return false;
+  rawBlock.transactions = rawBlock.transactions.filter((transaction) => {
+    if (!transaction.trx.transaction) { return false; }
 
-    transaction.trx.transaction.actions = transaction.trx.transaction.actions.filter(action => {
+    transaction.trx.transaction.actions = transaction.trx.transaction.actions.filter((action) => {
       // Filter out action if exists in Contract Whitelist
       if (contractWhitelist.indexOf(action.account) !== -1) {
-        return true
+        return true;
       }
-      return false
-    })
+      return false;
+    });
     // Filter transactions with ZERO actions
-    return transaction.trx.transaction.actions.length > 0
+    return transaction.trx.transaction.actions.length > 0;
   });
 }

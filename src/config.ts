@@ -1,19 +1,19 @@
+import dotenv from "dotenv";
 import * as fs from "fs";
 import * as path from "path";
-import dotenv from "dotenv";
 
 // parse .env file
-const envPath = path.join(__dirname, "..", ".env")
-dotenv.config({path: envPath})
+const envPath = path.join(__dirname, "..", ".env");
+dotenv.config({path: envPath});
 
 // EOSIO configurations
-export const EOSIO_API = process.env.EOSIO_API || "http://localhost:8888"
+export const EOSIO_API = process.env.EOSIO_API || "http://localhost:8888";
 
 // EOS Votes configurations
 export const EOSVOTES_PORT = process.env.EOSVOTES_PORT || 3000;
-export const EOSVOTES_FIRST_BLOCK = Number(process.env.EOSVOTES_FIRST_BLOCK || 9304569)
-export const EOSVOTES_CODE = process.env.EOSVOTES_CODE || "eosforumdapp"
-export const EOSVOTES_ONLY_IRREVERSIBLE = process.env.EOSVOTES_ONLY_IRREVERSIBLE ? JSON.parse(process.env.EOSVOTES_ONLY_IRREVERSIBLE) : true
+export const EOSVOTES_FIRST_BLOCK = Number(process.env.EOSVOTES_FIRST_BLOCK || 9304569);
+export const EOSVOTES_CODE = process.env.EOSVOTES_CODE || "eosforumdapp";
+export const EOSVOTES_ONLY_IRREVERSIBLE = process.env.EOSVOTES_ONLY_IRREVERSIBLE ? JSON.parse(process.env.EOSVOTES_ONLY_IRREVERSIBLE) : true;
 
 // DemuxJS
 export const DEMUX_LEVELDB = process.env.DEMUX_LEVELDB || "./mydb";
@@ -34,5 +34,5 @@ EOSVOTES_ONLY_IRREVERSIBLE=${EOSVOTES_ONLY_IRREVERSIBLE}
 DEMUX_LEVELDB=${DEMUX_LEVELDB}
 DEMUX_CONTRACT_BLACKLIST=${DEMUX_CONTRACT_BLACKLIST}
 DEMUX_CONTRACT_WHITELIST=${DEMUX_CONTRACT_WHITELIST}
-`)
+`);
 }

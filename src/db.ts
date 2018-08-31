@@ -1,5 +1,5 @@
-import * as config from "./config"
-import { LevelUpBase, Batch } from "levelup";
+import { Batch, LevelUpBase } from "levelup";
+import * as config from "./config";
 const levelup = require("levelup");
 const leveldown = require("leveldown");
 

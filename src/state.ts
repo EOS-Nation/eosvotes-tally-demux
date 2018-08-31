@@ -1,4 +1,4 @@
-import { State, Tally, TallySummary } from "../types"
+import { State, Tally, TallySummary } from "../types";
 
 /**
  * Initial State
@@ -8,9 +8,9 @@ export const state: State = {
     voters: {},
     indexState: {
         blockNumber: 0,
-        blockHash: ""
+        blockHash: "",
     },
-}
+};
 
 /**
  * Default Tally
@@ -35,13 +35,13 @@ export function defaultTally(blockNumber: number, blockHash: string): Tally {
 export function defaultTallySummary(): TallySummary {
     return {
         votes: {
-            total: 0
+            total: 0,
         },
         staked: {
-            total: 0
+            total: 0,
         },
         last_vote_weight: {
-            total: 0
-        }
-    }
+            total: 0,
+        },
+    };
 }

@@ -1,1 +1,1 @@
-export { LevelDBActionReader } from "./LevelDBActionReader"
+export { LevelDBActionReader } from "./LevelDBActionReader";
