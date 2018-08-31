@@ -1,4 +1,4 @@
-import { EOSForumProposeJSON } from "../eosforumdapp"
+import { EOSForumProposeJSON } from "../eosforumdapp";
 
 export interface TallySummary {
     /**
@@ -6,22 +6,22 @@ export interface TallySummary {
      */
     votes: {
         [vote: number]: number
-        total: number
-    },
+        total: number,
+    };
     /**
      * total `staked` votes (divide by 10000 for EOS precision)
      */
     staked: {
         [vote: number]: number
-        total: number
-    },
+        total: number,
+    };
     /**
      * total `last_vote_weight` votes
      */
     last_vote_weight: {
         [vote: number]: number
-        total: number
-    },
+        total: number,
+    };
 }
 
 export interface Tally extends EOSForumProposeJSON, TallySummary {
@@ -32,17 +32,17 @@ export interface Tally extends EOSForumProposeJSON, TallySummary {
     /**
      * Last Block Number
      */
-    blockNumber: number
+    blockNumber: number;
     /**
      * Last Block Hash
      */
-    blockHash: string
+    blockHash: string;
     /**
      * First Block Number
      */
-    firstBlockNumber: number
+    firstBlockNumber: number;
     /**
      * First Block Hash
      */
-    firstBlockHash: string
+    firstBlockHash: string;
 }

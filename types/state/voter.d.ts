@@ -1,14 +1,14 @@
-import { VoterInfo } from "../eosio/chain/get_account"
+import { VoterInfo } from "../eosio/chain/get_account";
 
 export interface Vote {
     /**
      * eosio.forum Vote value
      */
-    vote: number
+    vote: number;
     /**
      * eosio.forum Vote JSON
      */
-    vote_json: object
+    vote_json: object;
 }
 
 export interface Voter extends VoterInfo {
@@ -17,7 +17,7 @@ export interface Voter extends VoterInfo {
      */
     proposals: {
         [proposer: string]: {
-            [proposal_name: string]: Vote
-        }
-    }
+            [proposal_name: string]: Vote,
+        },
+    };
 }

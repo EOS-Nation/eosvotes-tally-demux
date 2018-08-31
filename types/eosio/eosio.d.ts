@@ -5,30 +5,30 @@
 //   "Set quicktype target language"
 
 export interface Eosio {
-    version:           string;
-    types:             Type[];
-    structs:           Struct[];
-    actions:           Action[];
-    tables:            Table[];
+    version: string;
+    types: Type[];
+    structs: Struct[];
+    actions: Action[];
+    tables: Table[];
     ricardian_clauses: RicardianClause[];
-    error_messages:    any[];
-    abi_extensions:    any[];
+    error_messages: any[];
+    abi_extensions: any[];
 }
 
 export interface Action {
-    name:               string;
-    type:               string;
+    name: string;
+    type: string;
     ricardian_contract: string;
 }
 
 export interface RicardianClause {
-    id:   string;
+    id: string;
     body: string;
 }
 
 export interface Struct {
-    name:   string;
-    base:   Base;
+    name: string;
+    base: Base;
     fields: Field[];
 }
 
@@ -43,30 +43,30 @@ export interface Field {
 }
 
 export interface Table {
-    name:       string;
+    name: string;
     index_type: string;
-    key_names:  string[];
-    key_types:  string[];
-    type:       string;
+    key_names: string[];
+    key_types: string[];
+    type: string;
 }
 
 export interface Type {
     new_type_name: string;
-    type:          string;
+    type: string;
 }
 
 // Extras
 
 export interface Authorization {
-    actor:      string;
+    actor: string;
     permission: string;
 }
 
 export interface Payload<Data = any> {
     transactionId: string;
-    actionIndex:   number;
-    account:       string;
-    name:          string;
+    actionIndex: number;
+    account: string;
+    name: string;
     authorization: Authorization[];
-    data:          Data;
+    data: Data;
 }

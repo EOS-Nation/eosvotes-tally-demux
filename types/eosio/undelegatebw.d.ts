@@ -8,16 +8,16 @@ import { Authorization } from "./eosio";
 
 export interface Undelegatebw {
     transactionId: string;
-    actionIndex:   number;
-    account:       string;
-    name:          string;
+    actionIndex: number;
+    account: string;
+    name: string;
     authorization: Authorization[];
-    data:          UndelegatebwData;
+    data: UndelegatebwData;
 }
 
 export interface UndelegatebwData {
-    from:                 string;
-    receiver:             string;
+    from: string;
+    receiver: string;
     unstake_net_quantity: string;
     unstake_cpu_quantity: string;
 }

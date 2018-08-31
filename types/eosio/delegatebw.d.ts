@@ -8,17 +8,17 @@ import { Authorization } from "./eosio";
 
 export interface Delegatebw {
     transactionId: string;
-    actionIndex:   number;
-    account:       string;
-    name:          string;
+    actionIndex: number;
+    account: string;
+    name: string;
     authorization: Authorization[];
-    data:          DelegatebwData;
+    data: DelegatebwData;
 }
 
 export interface DelegatebwData {
-    from:               string;
-    receiver:           string;
+    from: string;
+    receiver: string;
     stake_net_quantity: string;
     stake_cpu_quantity: string;
-    transfer:           number;
+    transfer: number;
 }

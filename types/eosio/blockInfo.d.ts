@@ -1,5 +1,5 @@
 export interface BlockInfo {
-    blockNumber: number
-    blockHash: string
-    previousBlockHash: string
+    blockNumber: number;
+    blockHash: string;
+    previousBlockHash: string;
 }

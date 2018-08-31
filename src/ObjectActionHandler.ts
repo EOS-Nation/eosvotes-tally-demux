@@ -1,14 +1,14 @@
 import { AbstractActionHandler, Block } from "../demux-js";
 import { db } from "./db";
-import { state } from "./state";
+import { state as initialState} from "./state";
 
 export default class ObjectActionHandler extends AbstractActionHandler {
     public async handleWithState(handle: any) {
-        await handle(state);
+        await handle(initialState);
     }
 
     public async loadIndexState() {
-        return state.indexState;
+        return initialState.indexState;
     }
 
     public async updateIndexState(state: any, block: Block, isReplay: boolean, context: any) {

@@ -1,41 +1,41 @@
-import { EOSForumProposeJSON } from "../eosforumdapp"
-import { Tally } from "./tally"
-import { Voter } from "./voter"
-export * from "./tally"
-export * from "./voter"
+import { EOSForumProposeJSON } from "../eosforumdapp";
+import { Tally } from "./tally";
+import { Voter } from "./voter";
+export * from "./tally";
+export * from "./voter";
 
 export interface Proposals {
     /**
      * proposer => proposal_name
      */
     [proposer: string]: {
-        [proposal_name: string]: Tally
-    }
+        [proposal_name: string]: Tally,
+    };
 }
 
 export interface Voters {
     /**
      * Voter Account Name
      */
-    [account_name: string]: Voter
+    [account_name: string]: Voter;
 }
 
 export interface State {
     /**
      * Status of all proposals
      */
-    proposals: Proposals,
+    proposals: Proposals;
     /**
      * Status of Voters
      *
      * Used to track which proposals to update when undelegatebw & delegatebw actions occur
      */
-    voters: Voters
+    voters: Voters;
     /**
      * Demux Index State
      */
     indexState: {
         blockNumber: number,
         blockHash: string,
-    }
+    };
 }

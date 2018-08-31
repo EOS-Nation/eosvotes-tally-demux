@@ -1,5 +1,5 @@
 import axios from "axios";
-import { EOSForumProposeJSON, EOSForumTableProposal, GetAccount, GetTableRows, Proposals, State, Voters } from "../types";
+import { EOSForumProposeJSON, EOSForumTableProposal, GetAccount, GetTableRows } from "../types";
 import * as config from "./config";
 
 /**
@@ -83,9 +83,9 @@ export async function getTableRows<T = any>(code: string, scope: string, table: 
     const params: any = {code, scope, table, json: true};
 
     // optional parameters
-    if (options.lower_bound) { params.lower_bound; }
-    if (options.upper_bound) { params.upper_bound; }
-    if (options.limit) { params.limit; }
+    if (options.lower_bound) { params.lower_bound = params.lower_bound; }
+    if (options.upper_bound) { params.upper_bound = params.upper_bound; }
+    if (options.limit) { params.limit = options.limit; }
 
     try {
         const {data} = await axios.post<GetTableRows<T>>(url, params);
@@ -109,7 +109,7 @@ export async function getProposal(code: string, proposer: string, proposal_name:
             // Match exact proposal_name
             if (row.proposal_name === proposal_name) {
                 const proposal_json = parseJSON(row.proposal_json);
-                const { proposal_name, title } = row;
+                const { title } = row;
 
                 // Define Proposal with JSON proposal
                 const proposal = {
