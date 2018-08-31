@@ -38,7 +38,7 @@ $ npm start
 
 ## LevelDB
 
-Quickly setup your local LevelDB cache by downloading from the `eosvotes.io` S3 bucket.
+Quickly setup your local LevelDB cache by downloading from the [`eosvotes.io` S3 bucket](https://s3.amazonaws.com/eosvotes.io/mydb.tar.gz).
 
 ```
 $ cd eosvotes-demux-tally
