@@ -1,7 +1,8 @@
 import { Batch, LevelUpBase } from "levelup";
 import * as config from "./config";
-const levelup = require("levelup");
-const leveldown = require("leveldown");
+import levelup from "levelup";
+import leveldown from "leveldown";
 
 // LevelDB to improve local caching
-export const db: LevelUpBase<Batch> = levelup(leveldown(config.DEMUX_LEVELDB));
+const down: any = leveldown(config.DEMUX_LEVELDB);
+export const db: LevelUpBase<Batch> = levelup(down);
