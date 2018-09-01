@@ -45,4 +45,10 @@ export interface Tally extends EOSForumProposeJSON, TallySummary {
      * First Block Hash
      */
     firstBlockHash: string;
+    /**
+     * Vote Participation: Percentage (Proposal EOS staked / 1B EOS)
+     *
+     * > token holders with no less than 15% vote participation
+     */
+    voteParticipation: number
 }
