@@ -1,9 +1,16 @@
-import { BlockInfo, Payload, State } from "../types";
+import { BlockInfo, Payload, State, UndelegatebwData } from "../types";
 import { EOSVOTES_CODE } from "./config";
 import { logInfo } from "./logging";
 
 function logBase(state: State, payload: Payload, blockInfo: BlockInfo, context: any) {
     logInfo(`${payload.account}::${payload.name}`, blockInfo.blockNumber, JSON.stringify(payload.data));
+}
+
+function logDelegatebw(state: State, payload: Payload<UndelegatebwData>, blockInfo: BlockInfo, context: any) {
+    const {from, receiver} = payload.data;
+    if (state.voters[from] || state.voters[receiver]) {
+        logInfo(`${payload.account}::${payload.name}`, blockInfo.blockNumber, JSON.stringify(payload.data));
+    }
 }
 
 export default [
@@ -29,10 +36,10 @@ export default [
     },
     {
         actionType: `eosio::delegatebw`,
-        effect: logBase,
+        effect: logDelegatebw,
     },
     {
         actionType: `eosio::undelegatebw`,
-        effect: logBase,
+        effect: logDelegatebw,
     },
 ];

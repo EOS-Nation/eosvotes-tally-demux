@@ -41,6 +41,7 @@ app.set("json spaces", 2);
 app.get("/", (req, res) => res.json(state));
 app.get("/proposals(.json)?$", (req, res) => res.json(state.proposals));
 app.get("/voters(.json)?$", (req, res) => res.json(state.voters));
+app.get("/global(.json)?$", (req, res) => res.json(state.global));
 
 // Scoped API
 app.get("/voter/:voter", (req, res) => res.json(state.voters[req.params.voter] || {}));

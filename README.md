@@ -30,6 +30,7 @@ $ npm start
 - [https://api.eosvotes.io](https://api.eosvotes.io)
 - [https://api.eosvotes.io/proposals](https://api.eosvotes.io/proposals)
 - [https://api.eosvotes.io/voters](https://api.eosvotes.io/voters)
+- [https://api.eosvotes.io/global](https://api.eosvotes.io/global)
 
 ## Scoped API
 

@@ -11,7 +11,8 @@ export const state: State = {
         blockHash: "",
     },
     global: {
-        supply: "0.0000 EOS",
+        supply: "1000000000.0000 EOS",
+        total_activated_stake: 3774551190700,
     },
 };
 
@@ -29,7 +30,10 @@ export function defaultTally(blockNumber: number, blockHash: string): Tally {
         blockHash,
         firstBlockNumber: blockNumber,
         firstBlockHash: blockHash,
-        voteParticipation: 0,
+        voteParticipation: {
+            supply: 0,
+            total_activated_stake: 0,
+        },
     }, defaultTallySummary());
 }
 

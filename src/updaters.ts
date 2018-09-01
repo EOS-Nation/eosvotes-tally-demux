@@ -3,7 +3,7 @@ import { EOSForumPropose, EOSForumProposeJSON, EOSForumUnpropose, EOSForumVote }
 import { EOSVOTES_CODE } from "./config";
 import { logError } from "./logging";
 import { defaultTally } from "./state";
-import { getAccount, getProposal, parseJSON } from "./utils";
+import { getAccount, getProposal, parseJSON, parseTokenString } from "./utils";
 
 /**
  * Propose - creation of new proposal based on proposer + proposal_name
@@ -140,12 +140,22 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
     }
 
     // Save Tally Calculations
+    const supply = parseTokenString(state.global.supply).amount;
     for (const proposer of Object.keys(summary)) {
         for (const proposal_name of Object.keys(summary[proposer])) {
-            // Save Votes
-            state.proposals[proposer][proposal_name].votes = summary[proposer][proposal_name].votes;
-            state.proposals[proposer][proposal_name].staked = summary[proposer][proposal_name].staked;
-            state.proposals[proposer][proposal_name].last_vote_weight = summary[proposer][proposal_name].last_vote_weight;
+            const votes = summary[proposer][proposal_name].votes;
+            const staked = summary[proposer][proposal_name].staked;
+            const last_vote_weight = summary[proposer][proposal_name].last_vote_weight;
+
+            // Update Proposals with Summary statistics
+            state.proposals[proposer][proposal_name].votes = votes;
+            state.proposals[proposer][proposal_name].staked = staked;
+            state.proposals[proposer][proposal_name].last_vote_weight = last_vote_weight;
+
+            // Update Vote Participation
+            // => Total EOS Voting Staked / Total EOS Supply (~1B)
+            state.proposals[proposer][proposal_name].voteParticipation.supply = (staked.total / 10000) / supply;
+            state.proposals[proposer][proposal_name].voteParticipation.total_activated_stake = staked.total / state.global.total_activated_stake;
         }
     }
 }

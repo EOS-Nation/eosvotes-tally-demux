@@ -1,31 +1,9 @@
-import { EOSForumProposeJSON } from "../eosforumdapp";
-import { Tally } from "./tally";
-import { Voter } from "./voter";
-export * from "./tally";
-export * from "./voter";
-
-export interface Global {
-    /**
-     * Current EOS supply from `eosio.token`
-     */
-    supply: string
-}
-
-export interface Proposals {
-    /**
-     * proposer => proposal_name
-     */
-    [proposer: string]: {
-        [proposal_name: string]: Tally,
-    };
-}
-
-export interface Voters {
-    /**
-     * Voter Account Name
-     */
-    [account_name: string]: Voter;
-}
+import { Proposals } from "./proposals";
+import { Voters } from "./voters";
+import { Global } from "./global";
+export * from "./proposals";
+export * from "./voters";
+export * from "./global";
 
 export interface State {
     /**
@@ -39,14 +17,14 @@ export interface State {
      */
     voters: Voters;
     /**
+     * Global
+     */
+    global: Global;
+    /**
      * Demux Index State
      */
     indexState: {
         blockNumber: number,
         blockHash: string,
     };
-    /**
-     * Global
-     */
-    global: Global;
 }

@@ -1,5 +1,14 @@
 import { EOSForumProposeJSON } from "../eosforumdapp";
 
+export interface Proposals {
+  /**
+   * proposer => proposal_name
+   */
+  [proposer: string]: {
+      [proposal_name: string]: Tally,
+  };
+}
+
 export interface TallySummary {
     /**
      * total amount of votes
@@ -46,9 +55,23 @@ export interface Tally extends EOSForumProposeJSON, TallySummary {
      */
     firstBlockHash: string;
     /**
-     * Vote Participation: Percentage (Proposal EOS staked / 1B EOS)
-     *
-     * > token holders with no less than 15% vote participation
+     * Vote Participation
      */
-    voteParticipation: number
+    voteParticipation: VoteParticipation
+}
+
+/**
+ * Vote Participation
+ *
+ * Token holders with no less than 15% vote participation
+ */
+export interface VoteParticipation {
+    /**
+     * Vote Participation: Percentage (EOS staked / Total EOS Supply "1B")
+     */
+    supply: number,
+    /**
+     * Vote Participation: Percentage (EOS staked / Total Activated Stake )
+     */
+    total_activated_stake: number,
 }
