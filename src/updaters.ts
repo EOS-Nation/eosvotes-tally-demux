@@ -8,7 +8,7 @@ import { getAccount, getProposal, parseJSON } from "./utils";
 /**
  * Propose - creation of new proposal based on proposer + proposal_name
  */
-function updatePropose(state: State, payload: Payload<EOSForumPropose>, blockInfo: BlockInfo, context: any) {
+function updatePropose(state: State, payload: Payload<EOSForumPropose>, blockInfo: BlockInfo) {
     const proposal_json = parseJSON(payload.data.proposal_json);
     const { proposer, proposal_name, title } = payload.data;
     const { blockHash, blockNumber } = blockInfo;
@@ -37,7 +37,7 @@ function updatePropose(state: State, payload: Payload<EOSForumPropose>, blockInf
 /**
  * Unpropose - removal of proposal based on proposer + proposal_name
  */
-function updateUnpropose(state: State, payload: Payload<EOSForumUnpropose>, blockInfo: BlockInfo, context: any) {
+function updateUnpropose(state: State, payload: Payload<EOSForumUnpropose>) {
     const { proposer, proposal_name } = payload.data;
 
     // Delete proposals
@@ -47,7 +47,7 @@ function updateUnpropose(state: State, payload: Payload<EOSForumUnpropose>, bloc
 /**
  * Vote - voter casts registers his vote on proposal
  */
-async function updateVote(state: State, payload: Payload<EOSForumVote>, blockInfo: BlockInfo, context: any) {
+async function updateVote(state: State, payload: Payload<EOSForumVote>, blockInfo: BlockInfo) {
     const eosforumVote = payload.data;
     const { proposer, proposal_name } = payload.data;
     const vote_json = parseJSON(payload.data.vote_json);
@@ -153,7 +153,7 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
 /**
  * Update Delegatebw & Undelegatebw
  */
-async function updateDelegatebw(state: State, payload: Delegatebw, blockInfo: BlockInfo, context: any) {
+async function updateDelegatebw(state: State, payload: Delegatebw, blockInfo: BlockInfo) {
     const { from, receiver } = payload.data;
 
     // Update Voter Delegated Resources

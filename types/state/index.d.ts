@@ -4,6 +4,13 @@ import { Voter } from "./voter";
 export * from "./tally";
 export * from "./voter";
 
+export interface Global {
+    /**
+     * Current EOS supply from `eosio.token`
+     */
+    supply: string
+}
+
 export interface Proposals {
     /**
      * proposer => proposal_name
@@ -38,4 +45,8 @@ export interface State {
         blockNumber: number,
         blockHash: string,
     };
+    /**
+     * Global
+     */
+    global: Global;
 }

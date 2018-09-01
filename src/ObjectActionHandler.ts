@@ -11,7 +11,7 @@ export default class ObjectActionHandler extends AbstractActionHandler {
         return initialState.indexState;
     }
 
-    public async updateIndexState(state: any, block: Block, isReplay: boolean, context: any) {
+    public async updateIndexState(state: any, block: Block, isReplay: boolean) {
         state.indexState.blockNumber = block.blockInfo.blockNumber;
         state.indexState.blockHash = block.blockInfo.blockHash;
     }

@@ -10,6 +10,9 @@ export const state: State = {
         blockNumber: 0,
         blockHash: "",
     },
+    global: {
+        supply: "0.0000 EOS",
+    },
 };
 
 /**
@@ -26,6 +29,7 @@ export function defaultTally(blockNumber: number, blockHash: string): Tally {
         blockHash,
         firstBlockNumber: blockNumber,
         firstBlockHash: blockHash,
+        voteParticipation: 0,
     }, defaultTallySummary());
 }
 

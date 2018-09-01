@@ -1,5 +1,5 @@
 import axios from "axios";
-import { EOSForumProposeJSON, EOSForumTableProposal, GetAccount, GetTableRows } from "../types";
+import { EOSForumProposeJSON, EOSForumTableProposal, GetAccount, GetTableRows, CurrencyStats } from "../types";
 import * as config from "./config";
 
 /**
@@ -128,6 +128,27 @@ export async function getProposal(code: string, proposer: string, proposal_name:
 }
 
 /**
+ * Get Currency Stats
+ * @example
+ *
+ * const stats = await getCurrencyStats("eosio.token", "EOS");
+ * { EOS:
+ *   {
+ *     supply: '1010557418.3311 EOS',
+ *     max_supply: '10000000000.0000 EOS',
+ *     issuer: 'eosio'
+ *   }
+ *  }
+ */
+export async function getCurrencyStats(code: string, symbol = "EOS") {
+    const url = config.EOSIO_API + "/v1/chain/get_currency_stats";
+    const params = {code, symbol};
+
+    const {data} = await axios.post<CurrencyStats>(url, params);
+    return data;
+}
+
+/**
  * voteWeightToday computes the stake2vote weight for EOS, in order to compute the decaying value.
  */
 export function voteWeightToday(): number {
@@ -141,3 +162,8 @@ export function voteWeightToday(): number {
     const yearsSinceY2K = weeksSinceY2K / weeksInAYear;
     return Math.pow(yearsSinceY2K, 2);
 }
+
+// (async () => {
+//     const stats = await getCurrencyStats("eosio.token", "EOS");
+//     console.log(stats);
+// })();
