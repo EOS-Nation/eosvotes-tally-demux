@@ -23,8 +23,6 @@ export interface Voter extends VoterInfo {
      * proposer => proposal_name
      */
     proposals: {
-        [proposer: string]: {
-            [proposal_name: string]: Vote,
-        },
+        [proposal_name: string]: Vote,
     };
 }

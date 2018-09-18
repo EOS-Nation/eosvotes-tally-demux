@@ -1,12 +1,10 @@
 import { EOSForumProposeJSON } from "../eosforumdapp";
 
 export interface Proposals {
-  /**
-   * proposer => proposal_name
-   */
-  [proposer: string]: {
-      [proposal_name: string]: Tally,
-  };
+    /**
+     * proposal_name
+     */
+    [proposal_name: string]: Tally,
 }
 
 export interface TallySummary {

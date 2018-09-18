@@ -19,7 +19,7 @@ export default [
         effect: logBase,
     },
     {
-        actionType: `${EOSVOTES_CODE}::unpropose`,
+        actionType: `${EOSVOTES_CODE}::expire`,
         effect: logBase,
     },
     {
@@ -31,7 +31,7 @@ export default [
         effect: logBase,
     },
     {
-        actionType: `${EOSVOTES_CODE}::cleanvotes`,
+        actionType: `${EOSVOTES_CODE}::clnproposal`,
         effect: logBase,
     },
     {

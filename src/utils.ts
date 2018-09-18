@@ -100,25 +100,22 @@ export async function getTableRows<T = any>(code: string, scope: string, table: 
  * @example
  * const proposal = await getProposal("eosforumdap", "eostribeprod")
  */
-export async function getProposal(code: string, proposer: string, proposal_name: string): Promise<EOSForumProposeJSON|null> {
+export async function getProposal(code: string, proposal_name: string): Promise<EOSForumProposeJSON|null> {
     // TO-DO handle greater then 50 proposals
+    console.log("TO-DO Implement better `getProposal`");
     const limit = 50;
     while (true) {
-        const table = await getTableRows<EOSForumTableProposal>(code, proposer, "proposal", {limit});
+        const table = await getTableRows<EOSForumTableProposal>(code, code, "proposal", {limit});
         for (const row of table.rows) {
             // Match exact proposal_name
             if (row.proposal_name === proposal_name) {
-                const proposal_json = parseJSON(row.proposal_json);
-                const { title } = row;
-
-                // Define Proposal with JSON proposal
-                const proposal = {
-                    proposer,
-                    proposal_name,
-                    title,
-                    proposal_json,
+                return {
+                    proposer: row.proposer,
+                    proposal_name: row.proposal_name,
+                    title: row.title,
+                    expires_at: row.expires_at,
+                    proposal_json: parseJSON(row.proposal_json),
                 };
-                return proposal;
             }
         }
         // End of Table

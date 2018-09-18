@@ -1,16 +1,16 @@
 import { BlockInfo, Delegatebw, Payload, State, Tally, TallySummary, Vote } from "../types";
-import { EOSForumPropose, EOSForumProposeJSON, EOSForumUnpropose, EOSForumVote } from "../types/eosforumdapp";
+import { EOSForumPropose, EOSForumProposeJSON, EOSForumExpire, EOSForumVote, EOSForumUnvote, EOSForumCleanProposal } from "../types";
 import { EOSVOTES_CODE } from "./config";
 import { logError } from "./logging";
 import { defaultTally } from "./state";
 import { getAccount, getProposal, parseJSON, parseTokenString } from "./utils";
 
 /**
- * Propose - creation of new proposal based on proposer + proposal_name
+ * Propose - creation of new proposal based on proposal_name
  */
 function updatePropose(state: State, payload: Payload<EOSForumPropose>, blockInfo: BlockInfo) {
     const proposal_json = parseJSON(payload.data.proposal_json);
-    const { proposer, proposal_name, title } = payload.data;
+    const { proposer, proposal_name, title, expires_at } = payload.data;
     const { blockHash, blockNumber } = blockInfo;
 
     // Define Proposal with JSON proposal
@@ -19,15 +19,14 @@ function updatePropose(state: State, payload: Payload<EOSForumPropose>, blockInf
         proposal_name,
         title,
         proposal_json,
+        expires_at,
     };
 
     // Set default tally
     const tally: Tally = Object.assign(defaultTally(blockNumber, blockHash), proposal);
 
     // Reset or include proposals
-    // If proposer pushes a proposal with the same name, reset tally
-    if (!state.proposals[proposer]) { state.proposals[proposer] = {}; }
-    state.proposals[proposer][proposal_name] = tally;
+    state.proposals[proposal_name] = tally;
 
     // Update Demux Index State
     state.indexState.blockHash = blockHash;
@@ -35,13 +34,13 @@ function updatePropose(state: State, payload: Payload<EOSForumPropose>, blockInf
 }
 
 /**
- * Unpropose - removal of proposal based on proposer + proposal_name
+ * Unpropose - removal of proposal based on proposal_name
  */
-function updateUnpropose(state: State, payload: Payload<EOSForumUnpropose>) {
-    const { proposer, proposal_name } = payload.data;
+function updateExpire(state: State, payload: Payload<EOSForumExpire>) {
+    const { proposal_name } = payload.data;
 
     // Delete proposals
-    if (state.proposals[proposer] && state.proposals[proposer][proposal_name]) { delete state.proposals[proposer][proposal_name]; }
+    if (state.proposals[proposal_name]) { delete state.proposals[proposal_name]; }
 }
 
 /**
@@ -49,7 +48,7 @@ function updateUnpropose(state: State, payload: Payload<EOSForumUnpropose>) {
  */
 async function updateVote(state: State, payload: Payload<EOSForumVote>, blockInfo: BlockInfo) {
     const eosforumVote = payload.data;
-    const { proposer, proposal_name } = payload.data;
+    const { proposal_name } = payload.data;
     const vote_json = parseJSON(payload.data.vote_json);
 
     // HTTP connection required to get account details
@@ -67,11 +66,11 @@ async function updateVote(state: State, payload: Payload<EOSForumVote>, blockInf
     state.voters[eosforumVote.voter] = Object.assign(account.voter_info, {proposals});
 
     // Update vote details for target proposal
-    if (!state.voters[eosforumVote.voter].proposals[proposer]) { state.voters[eosforumVote.voter].proposals[proposer] = {}; }
-    state.voters[eosforumVote.voter].proposals[proposer][proposal_name] = vote;
+    state.voters[eosforumVote.voter].proposals[proposal_name] = vote;
 
     // Update Tally Status
     updateTally(state, blockInfo);
+
 }
 
 /**
@@ -82,9 +81,7 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
 
     // Summary of Votes
     const summary: {
-        [proposer: string]: {
-            [proposal_name: string]: TallySummary,
-        },
+        [proposal_name: string]: TallySummary,
     } = {};
 
     for (const account_name of Object.keys(state.voters)) {
@@ -92,71 +89,64 @@ async function updateTally(state: State, blockInfo: BlockInfo) {
         const voter = state.voters[account_name];
 
         // Iterate over each proposal
-        for (const proposer of Object.keys(voter.proposals)) {
-            for (const proposal_name of Object.keys(voter.proposals[proposer])) {
-                const {vote} = voter.proposals[proposer][proposal_name];
+        for (const proposal_name of Object.keys(voter.proposals)) {
+            const {vote} = voter.proposals[proposal_name];
 
-                // Update Block Status
-                if (state.proposals[proposer] && state.proposals[proposer][proposal_name]) {
-                    if (!state.proposals[proposer]) { state.proposals[proposer] = {}; }
-                    state.proposals[proposer][proposal_name].blockNumber = blockNumber;
-                    state.proposals[proposer][proposal_name].blockHash = blockHash;
-                } else {
-                    // Usually happens if EOSVotes tally started after the proposal
-                    logError("eosforumdapp::vote", blockNumber, `tally missing [${proposer}:${proposal_name}]`);
+            // Update Block Status
+            if (state.proposals[proposal_name]) {
+                state.proposals[proposal_name].blockNumber = blockNumber;
+                state.proposals[proposal_name].blockHash = blockHash;
+            } else {
+                // Usually happens if EOSVotes tally started after the proposal
+                logError("eosforumdapp::vote", blockNumber, `tally missing [${proposal_name}]`);
 
-                    // UPDATE missing `proposals`
-                    const proposal = await getProposal(EOSVOTES_CODE, proposer, proposal_name);
+                // UPDATE missing `proposals`
+                const proposal = await getProposal(EOSVOTES_CODE, proposal_name);
 
-                    if (proposal) {
-                        // Set default tally
-                        const tally: Tally = Object.assign(defaultTally(blockNumber, blockHash), proposal);
+                if (proposal) {
+                    // Set default tally
+                    const tally: Tally = Object.assign(defaultTally(blockNumber, blockHash), proposal);
 
-                        if (!state.proposals[proposer]) { state.proposals[proposer] = {}; }
-                        state.proposals[proposer][proposal_name] = tally;
-                    }
+                    state.proposals[proposal_name] = tally;
                 }
-
-                // Calculate Summary of Votes
-                // Default Summary if not exist
-                if (!summary[proposer]) { summary[proposer] = {}; }
-                if (summary[proposer] && !summary[proposer][proposal_name]) {
-                    summary[proposer][proposal_name] = defaultTally(blockNumber, blockHash);
-                }
-
-                // Calculate Votes
-                if (summary[proposer][proposal_name].votes[vote]) { summary[proposer][proposal_name].votes[vote] += 1; } else { summary[proposer][proposal_name].votes[vote] = 1; }
-                summary[proposer][proposal_name].votes.total += 1;
-
-                // Calculate Staked
-                if (summary[proposer][proposal_name].staked[vote]) { summary[proposer][proposal_name].staked[vote] += voter.staked; } else { summary[proposer][proposal_name].staked[vote] = voter.staked; }
-                summary[proposer][proposal_name].staked.total += voter.staked;
-
-                // Calculate Last Vote Weight
-                if (summary[proposer][proposal_name].last_vote_weight[vote]) { summary[proposer][proposal_name].last_vote_weight[vote] += Number(voter.last_vote_weight); } else { summary[proposer][proposal_name].last_vote_weight[vote] = Number(voter.last_vote_weight); }
-                summary[proposer][proposal_name].last_vote_weight.total += Number(voter.last_vote_weight);
             }
+
+            // Calculate Summary of Votes
+            // Default Summary if not exist
+            if (!summary[proposal_name]) {
+                summary[proposal_name] = defaultTally(blockNumber, blockHash);
+            }
+
+            // Calculate Votes
+            if (summary[proposal_name].votes[vote]) { summary[proposal_name].votes[vote] += 1; } else { summary[proposal_name].votes[vote] = 1; }
+            summary[proposal_name].votes.total += 1;
+
+            // Calculate Staked
+            if (summary[proposal_name].staked[vote]) { summary[proposal_name].staked[vote] += voter.staked; } else { summary[proposal_name].staked[vote] = voter.staked; }
+            summary[proposal_name].staked.total += voter.staked;
+
+            // Calculate Last Vote Weight
+            if (summary[proposal_name].last_vote_weight[vote]) { summary[proposal_name].last_vote_weight[vote] += Number(voter.last_vote_weight); } else { summary[proposal_name].last_vote_weight[vote] = Number(voter.last_vote_weight); }
+            summary[proposal_name].last_vote_weight.total += Number(voter.last_vote_weight);
         }
     }
 
     // Save Tally Calculations
     const supply = parseTokenString(state.global.supply).amount;
-    for (const proposer of Object.keys(summary)) {
-        for (const proposal_name of Object.keys(summary[proposer])) {
-            const votes = summary[proposer][proposal_name].votes;
-            const staked = summary[proposer][proposal_name].staked;
-            const last_vote_weight = summary[proposer][proposal_name].last_vote_weight;
+    for (const proposal_name of Object.keys(summary)) {
+        const votes = summary[proposal_name].votes;
+        const staked = summary[proposal_name].staked;
+        const last_vote_weight = summary[proposal_name].last_vote_weight;
 
-            // Update Proposals with Summary statistics
-            state.proposals[proposer][proposal_name].votes = votes;
-            state.proposals[proposer][proposal_name].staked = staked;
-            state.proposals[proposer][proposal_name].last_vote_weight = last_vote_weight;
+        // Update Proposals with Summary statistics
+        state.proposals[proposal_name].votes = votes;
+        state.proposals[proposal_name].staked = staked;
+        state.proposals[proposal_name].last_vote_weight = last_vote_weight;
 
-            // Update Vote Participation
-            // => Total EOS Voting Staked / Total EOS Supply (~1B)
-            state.proposals[proposer][proposal_name].voteParticipation.supply = (staked.total / 10000) / supply;
-            state.proposals[proposer][proposal_name].voteParticipation.total_activated_stake = staked.total / state.global.total_activated_stake;
-        }
+        // Update Vote Participation
+        // => Total EOS Voting Staked / Total EOS Supply (~1B)
+        state.proposals[proposal_name].voteParticipation.supply = (staked.total / 10000) / supply;
+        state.proposals[proposal_name].voteParticipation.total_activated_stake = staked.total / state.global.total_activated_stake;
     }
 }
 
@@ -185,18 +175,52 @@ async function updateVoter(account_name: string, state: State, blockInfo: BlockI
     await updateTally(state, blockInfo);
 }
 
+/**
+ * Unvote - remove proposal_name from voter state
+ */
+async function updateUnvote(state: State, payload: Payload<EOSForumUnvote>, blockInfo: BlockInfo) {
+    const { proposal_name, voter } = payload.data;
+
+    // Remove voter proposals
+    if (state.voters[voter] && state.voters[voter].proposals[proposal_name]) { delete state.voters[voter].proposals[proposal_name]; }
+
+    await updateTally(state, blockInfo);
+}
+
+/**
+ * Clean Proposal - remove proposal_name from voter state
+ */
+async function updateCleanProposal(state: State, payload: Payload<EOSForumCleanProposal>, blockInfo: BlockInfo) {
+    const { proposal_name } = payload.data;
+
+    // Remove proposal from all voters
+    for (const voter of Object.keys(state.voters)) {
+        if (state.voters[voter].proposals[proposal_name]) { delete state.voters[voter].proposals[proposal_name]; }
+    }
+
+    await updateTally(state, blockInfo);
+}
+
 export default [
     {
         actionType: `${EOSVOTES_CODE}::propose`,
         updater: updatePropose,
     },
     {
-        actionType: `${EOSVOTES_CODE}::unpropose`,
-        updater: updateUnpropose,
+        actionType: `${EOSVOTES_CODE}::expire`,
+        updater: updateExpire,
     },
     {
         actionType: `${EOSVOTES_CODE}::vote`,
         updater: updateVote,
+    },
+    {
+        actionType: `${EOSVOTES_CODE}::unvote`,
+        updater: updateUnvote,
+    },
+    {
+        actionType: `${EOSVOTES_CODE}::clnproposal`,
+        updater: updateCleanProposal,
     },
     {
         actionType: `eosio::delegatebw`,

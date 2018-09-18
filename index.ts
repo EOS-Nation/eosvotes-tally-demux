@@ -45,10 +45,9 @@ app.get("/global(.json)?$", (req, res) => res.json(state.global));
 
 // Scoped API
 app.get("/voter/:voter", (req, res) => res.json(state.voters[req.params.voter] || {}));
-app.get("/proposal/:proposer", (req, res) => res.json(state.proposals[req.params.proposer] || {}));
-app.get("/proposal/:proposer/:proposal_name", (req, res) => {
-    const { proposer, proposal_name } = req.params;
-    if (state.proposals[proposer] && state.proposals[proposer][proposal_name]) { res.json(state.proposals[proposer][proposal_name]);
+app.get("/proposal/:proposal_name", (req, res) => {
+    const { proposal_name } = req.params;
+    if (state.proposals[proposal_name]) { res.json(state.proposals[proposal_name]);
     } else { res.json({}); }
 });
 
